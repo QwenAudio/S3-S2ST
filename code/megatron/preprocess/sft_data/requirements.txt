@@ -1,0 +1,11 @@
+numpy
+python-rapidjson
+ftfy
+regex
+zstandard
+tqdm
+zhon
+jsonlines
+tiktoken
+transformers
+tokenizers

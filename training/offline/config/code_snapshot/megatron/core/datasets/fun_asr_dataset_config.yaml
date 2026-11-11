@@ -1,0 +1,42 @@
+# FunASR Audio Dataset Configuration for MinMo S2T
+dataset:
+  type: "FunASRDataset"
+  path: "/path/to/audio_data"
+  index_ds: "JsonlDataset"
+  preprocessor_speech: "AudioPreprocessor"
+  preprocessor_text: "TextPreprocessor"
+  frontend: "AudioFrontend"
+  tokenizer: "QWenVLTokenizer"
+  int_pad_value: -1
+  float_pad_value: 0.0
+
+audio_preprocessor:
+  type: "AudioPreprocessor"
+  fs: 16000
+  n_mels: 80
+  n_fft: 400
+  hop_length: 160
+  win_length: 400
+  fmin: 0
+  fmax: 8000
+
+text_preprocessor:
+  type: "TextPreprocessor"
+  text_cleaner: "TextCleaner"
+  tokenizer: "QWenVLTokenizer"
+
+audio_frontend:
+  type: "AudioFrontend"
+  fs: 16000
+  n_mels: 80
+  n_fft: 400
+  hop_length: 160
+  win_length: 400
+  fmin: 0
+  fmax: 8000
+
+tokenizer:
+  type: "QWenVLTokenizer"
+  vocab_file: "/path/to/tokenizer.json"
+  merge_file: "/path/to/merges.txt"
+  max_length: 2048

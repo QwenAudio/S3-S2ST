@@ -1,0 +1,231 @@
+frontend: WhisperFrontend
+frontend_conf:
+  fs: 16000
+  n_mels: 128
+  do_pad_trim: false
+  filters_path: ${S3_ROOT}/models/frontend/mel_filters.npz
+model_conf:
+  fm_conf:
+    model: CosyVoiceFlowMatching
+    model_conf:
+      codebook_size: 59049
+      unified: true
+      attn_type: v2
+      upsample_method: repeat
+      max_vol: 1.0
+      no_prompt_ratio: 0.5
+      no_spk_emb_prompt_ratio: 0.0
+      max_prompt_ratio: 0.3
+      max_prompt_num_token: -1
+      embed_dim: 896
+      model_size: 1024
+      xvec_size: 192
+      feat_token_ratio: 4
+      lookahead_length: 3
+      training_cfg_rate: 0.2
+      only_mask_loss: true
+      flash_attn: false
+      dit_conf:
+        dim: 1024
+        depth: 22
+        activation_checkpoint: true
+        heads: 16
+        dim_head: 64
+        ff_mult: 2
+        mel_dim: 80
+        mu_dim: 896
+        spk_dim: 80
+        causal_mask_type:
+        - prob_min: 0
+          prob_max: 0.25
+          block_size: -1
+          num_left_chunk:
+          - -1
+          ratio: 4
+        - prob_min: 0.25
+          prob_max: 0.5
+          block_size: 1
+          num_left_chunk:
+          - -1
+          ratio: 4
+        - prob_min: 0.5
+          prob_max: 0.75
+          block_size: 7
+          num_left_chunk:
+          - -1
+          ratio: 4
+        - prob_min: 0.75
+          prob_max: 1.0
+          block_size: 15
+          num_left_chunk:
+          - -1
+          ratio: 4
+      prompt_conf:
+        prompt_type: prefix
+        prompt_width_ratio_range:
+        - 0.7
+        - 1.0
+      mel_feat_conf:
+        n_fft: 1920
+        hop_length: 480
+        win_length: 1920
+        sampling_rate: 24000
+        n_mel_channels: 80
+        mel_fmin: 0
+        mel_fmax: 12000
+        center: false
+        feat_type: power_log
+  llm_conf:
+    enabled: true
+    loss_weight: 0.0
+    text_loss_weight: 0.0
+    audio_loss_weight: 0.0
+    model: CosyVoiceMixedLMSimpleSysV2
+    model_conf:
+      unified: true
+      duration_embedding: true
+      duration_embedding_type: pe
+      lsm_weight: 0.0
+      length_normalized_loss: true
+      codec_unit: 59249
+      llm: Qwen2-0.5B
+      llm_conf:
+        hub: hf
+        freeze: true
+        llm_dtype: bf16
+        init_param_path: ${S3_ROOT}/data/train/REQUIRES_USER_DATA/Qwen2-0.5B-CosyVoice
+        use_lora: false
+        lora_conf:
+          task_type: CAUSAL_LM
+          r: 16
+          lora_alpha: 32
+          lora_dropout: 0.05
+          bias: none
+          target_modules:
+          - q_proj
+          - v_proj
+        speech_token_extractor_conf:
+          enabled: true
+          type: automodel
+          sliding_window_size: 4000
+          sliding_window_left_context: 200
+          sliding_window_bin_threshold: 1000
+          downsample_factor: 8
+          automodel_conf:
+            model: SenseVoiceL
+            init_param: ${S3_ROOT}/data/train/REQUIRES_USER_DATA/extract_model.pt
+            model_conf:
+              lsm_weight: 0.1
+              length_normalized_loss: true
+              activation_checkpoint: true
+              sos: <|startoftranscript|>
+              eos: <|endoftext|>
+              downsample_rate: 4
+              use_padmask: true
+              dims:
+                n_mels: 128
+                n_vocab: 60515
+                n_audio_ctx: 1500
+                n_audio_state: 1280
+                n_audio_head: 20
+                n_audio_layer: 32
+                n_text_ctx: 448
+                n_text_state: 1280
+                n_text_head: 20
+                n_text_layer: 32
+                att_type: default
+            load_decoder: false
+            encoder: SenseVoiceQuantizedEncoder
+            encoder_conf:
+              input_size: 128
+              attention_heads: 20
+              linear_units: 1280
+              num_blocks: 32
+              dropout_rate: 0.1
+              positional_dropout_rate: 0.1
+              attention_dropout_rate: 0.1
+              kernel_size: 31
+              sanm_shfit: 0
+              att_type: self_att_fsmn_sdpa
+              downsample_rate: 4
+              use_padmask: true
+              max_position_embeddings: 2048
+              rope_theta: 10000
+              freeze: false
+              freeze_exclude_key: attn
+              quantize_layer_idx: 11
+              normalized_quant_input: false
+              quantizer_config:
+                levels:
+                - 3
+                - 3
+                - 3
+                - 3
+                - 3
+                - 3
+                - 3
+                - 3
+                - 3
+                - 3
+                num_codebooks: 1
+                downsample_rate: 2
+                name: finite_scalar_quantizer_down
+            tokenizer: SenseVoiceTokenizer
+            tokenizer_conf:
+              is_multilingual: true
+              num_languages: 8749
+              vocab_path: ${S3_ROOT}/data/train/REQUIRES_USER_DATA/multilingual.tiktoken
+dataset: MinMo_S2S_Channels_SFT_Pack_Mega
+dataset_conf:
+  use_oss_cache: false
+  index_ds: MinMo_S2S_Channels_SFT_Pack_Lazy
+  matterhorn_format: false
+  batch_sampler: BatchSampler
+  batch_type: example
+  batch_size: 1
+  shuffle: false
+  sort_size: 512
+  batch_size_scale_ratio_max: 2
+  load_audio_num_threads: 4
+  num_workers: 16
+  prefetch_factor: 8
+  max_merged_slice_duration_sec:
+  - 5.0
+  - 300.0
+  audio_adaptor_downsample_rate: 2
+  audio_encoder_downsample_rate: 4
+  data_split_num: 10
+  data_split_size: 1
+  batch_size_sample_max: 10
+  retry: 3
+  batch_size_token_max: 8192
+  text_codec_mix_ratio:
+  - 13
+  - 52
+  audio_delay: 26
+  continuous_in: true
+  multiturn_num_max: 1000
+  max_token_length: 8192
+  max_source_length: 6000
+  max_speech_length: 6000
+  max_codec_label_length: 11000
+  prefetch_audio_to_local: true
+  audio_cache_dir: ${S3_ROOT}/code/megatron/streaming/artifacts/cache/s2st_talker_audio
+  audio_cache_type: segments
+  audio_cache_format: flac
+  text_data_random_drop_ratio: 0.0
+  offline_speech_tokenize: true
+  discrete_tokenizer_frame_rate: 12.5
+  audio_tokenizer_code_book_size: 59049
+  single_process_read: false
+  use_file_index: true
+  file_index_max_file_handles_to_keep: 100
+  file_index_max_file_handle_idle_time: 600
+  pretrain_mode: true
+  preprocessor_speech: null
+tokenizer: HuggingfaceTokenizer
+tokenizer_conf:
+  init_param_path: ${S3_ROOT}/models/offline
+train_conf: {}
+train_data_set_list: ${S3_ROOT}/data/train/REQUIRES_USER_DATA/data.list
+valid_data_set_list: ${S3_ROOT}/data/train/REQUIRES_USER_DATA/data.list

@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "layers": [
+    4,
+    8,
+    12,
+    16,
+    20,
+    24,
+    28,
+    32
+  ],
+  "hidden_size": 2560,
+  "parameter_key": "thinker_layer_fusion.weights",
+  "initialization": "same mixed initialization as streaming_v6 experiment; see initialization/SOURCE.json",
+  "hidden_convention": "intermediate post-block outputs; final layer uses existing post-final-norm output",
+  "formula": "sum_i(w_i * h_i) before existing projection; no softmax or added norm"
+}

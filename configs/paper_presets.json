@@ -1,0 +1,39 @@
+{
+  "latency_fixed01": {
+    "base": 0.1,
+    "cap": 0.1
+  },
+  "latency_dynamic099": {
+    "base": 0.1,
+    "cap": 0.99,
+    "saturation": 1.0,
+    "power": 0.5
+  },
+  "common": {
+    "thinker": "greedy",
+    "talker_temperature": 0.8,
+    "talker_top_k": 5,
+    "talker_top_p": 0.8,
+    "seed": 0,
+    "encoder_chunk_ms": 640,
+    "encoder_lookahead_ms": 160,
+    "stft_lookahead_ms": 2.5,
+    "fm_lookahead_codec": 3,
+    "vocoder_lookahead_mel": 8,
+    "eos_hold_codec": 1
+  },
+  "offline": {
+    "frontend": "full_record_utterance_max",
+    "fm_chunk": 15,
+    "speaker": "full_source_capped_10s",
+    "note": "preserve the actual offline main-table rendering protocol"
+  },
+  "default": "dynamic099",
+  "historical_control": "fixed05",
+  "historical_fixed05": {
+    "base": 0.5,
+    "cap": 0.5,
+    "fm_chunk": 8,
+    "speaker": "all_consumed_prefix_each_nonempty_write_no_crop"
+  }
+}

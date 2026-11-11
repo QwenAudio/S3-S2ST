@@ -1,0 +1,13 @@
+{
+  "version": "0.1.8",
+  "wheel_sha256": "b2083e7f38ac38fcbecdf7aec6ac6f0e3d1a11b763facfa4daabc12138215454",
+  "files": {
+    "constants.py": "aa9826917f691473f3b04e30eb2d56ae52b160e859de9abca94f3ba8e57f5ef5",
+    "token_parser.py": "788054387df18e34eda5315c86a7c5df47cf90576f2f398449c11abd18a8f47b",
+    "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "fsts/zh/itn/tagger.fst": "1b57d35fa33030b50f2699d77b3c2cf2c3d5961c45d450322f5cf9aa729b810c",
+    "fsts/zh/itn/verbalizer.fst": "440ac75aaeda3dd81f91b42abec4c08e84b7b0186462cc536a3a74d3ad1f13c4",
+    "fsts/zh/tn/tagger.fst": "cf341314c51f7ce59049f3b2c42f0ce8fd71e6d08d4d6969613aad384a5e2ae8",
+    "fsts/zh/tn/verbalizer.fst": "5a13cd679dd54637d12d2bd1bd33ee2165d91c867e14468c93195af02256e5da"
+  }
+}

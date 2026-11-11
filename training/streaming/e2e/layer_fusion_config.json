@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "layers": [
+    4,
+    8,
+    12,
+    16,
+    20,
+    24,
+    28,
+    32
+  ],
+  "hidden_size": 2560,
+  "parameter_key": "thinker_layer_fusion.weights",
+  "hidden_convention": "intermediate_post_block_final_post_norm",
+  "talker_profile": "continuous",
+  "initialization": "all model weights from this experiment talker/iter_0005000",
+  "full_recompute": "uniform_1; tap checkpoint outputs"
+}

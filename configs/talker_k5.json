@@ -1,0 +1,14 @@
+{
+  "name": "talker_k5",
+  "thinker": {
+    "temperature": 0,
+    "top_k": 1,
+    "top_p": 1
+  },
+  "talker": {
+    "temperature": 0.8,
+    "top_k": 5,
+    "top_p": 0.8
+  },
+  "seed": 0
+}

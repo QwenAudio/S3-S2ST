@@ -1,0 +1,110 @@
+model: CosyVoiceFlowMatching
+model_conf:
+  embed_dim: 80
+  model_dtype: fp32
+  codebook_size: 59049
+  model_size: 1024
+  xvec_size: 192
+  feat_token_ratio: 4
+  mel_norm_type: null
+  lookahead_length: 3
+  training_cfg_rate: 0.2
+  inference_cfg_rate: 0.7
+  only_mask_loss: true
+  dit_conf:
+    dim: 1024
+    depth: 22
+    heads: 16
+    dim_head: 64
+    ff_mult: 2
+    mel_dim: 80
+    mu_dim: 80
+    spk_dim: 80
+    causal_mask_type:
+    - prob_min: 0
+      prob_max: 0.25
+      block_size: -1
+      ratio: 4
+    - prob_min: 0.25
+      prob_max: 0.5
+      block_size: 1
+      ratio: 4
+    - prob_min: 0.5
+      prob_max: 0.75
+      block_size: 7
+      ratio: 4
+    - prob_min: 0.75
+      prob_max: 1.0
+      block_size: 15
+      ratio: 4
+  mel_feat_conf:
+    n_fft: 1920
+    hop_length: 480
+    win_length: 1920
+    sampling_rate: 24000
+    n_mel_channels: 80
+    mel_fmin: 0
+    mel_fmax: null
+    center: false
+    feat_type: power_log
+  prompt_conf:
+    prompt_type: prefix
+    prompt_width_ratio_range:
+    - 0.7
+    - 1.0
+frontend: WhisperFrontend
+frontend_conf:
+  fs: 24000
+  n_mels: 80
+  do_pad_trim: false
+  filters_path: ${S3_ROOT}/models/frontend/fm_mel_filters.npz
+train_conf:
+  use_lora: false
+  accum_grad: 1
+  grad_clip: 1
+  max_epoch: 150
+  keep_nbest_models: 150000
+  log_interval: 50
+  effective_save_name_excludes:
+  - none
+  resume: true
+  validate_interval: 10000
+  save_checkpoint_interval: 10000
+  avg_nbest_model: 100
+  use_bf16: false
+  use_deepspeed: true
+  save_init_model: false
+  loss_rescale_by_rank: false
+  deepspeed_config: null
+optim: adamw
+optim_conf:
+  lr: 0.0001
+scheduler: warmuplr
+scheduler_conf:
+  warmup_steps: 10000
+dataset: CosyVoiceFlowMetaDataset
+dataset_conf:
+  wav_token_ratio: 1920
+  load_meta_data_key: text,token,wav_path,spk_emb_path
+  set_invalid_xvec_zeros: true
+  index_ds: CosyVoice
+  data_split_num: 64
+  batch_sampler: BatchSampler
+  shuffle: true
+  sort_size: 512
+  batch_type: token
+  batch_size: 10000
+  batch_size_token_max: 12000
+  batch_size_sample_max: 100
+  max_token_length: 2250
+  max_text_length: null
+  batch_size_scale_threshold: 3000
+  num_workers: 6
+  retry: 100
+enable_tf32: true
+debug: false
+train_data_set_list: null
+valid_data_set_list: null
+output_dir: null
+init_param: null
+device: cpu

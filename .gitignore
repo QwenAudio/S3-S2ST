@@ -1,0 +1,60 @@
+# Local assets: never publish weights, datasets, environments or experiment output.
+/checkpoints/
+/models/
+/data/
+/cache/
+/runs/
+/envs/
+/tmp/
+/provenance/
+/evaluation/third_party/cer_tool_parallel/models/
+/evaluation/third_party/torch_cache/
+/evaluation/voice_eval/thirdparty/3D-Speaker/pretrained/
+# Weight formats anywhere, including files placed outside the normal asset roots.
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.bin
+*.zarr/
+# Source directories named models/data remain versioned.
+__pycache__/
+*.py[cod]
+*.log
+*.o
+*.so
+**/build/
+.pytest_cache/
+*.egg-info/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.DS_Store
+._*
+
+# Historical local experiment metadata
+/training/**/actual_arguments.json
+/training/**/baseline_arguments.json
+/training/**/IO_DEFENSE_*.md
+
+# Distributed checkpoint shards and optimizer state
+*.distcp
+*.nemo
+iter_[0-9]*/
+
+# Historical internal data examples and evaluation output (not framework code).
+/code/megatron/eval/llm/gsm8k-local/
+/vendor/FunASR/funasr/datasets/minmo_datasets/cache_utils/sample_project.json
+/vendor/offline_funasr/funasr/datasets/minmo_datasets/cache_utils/sample_project.json
+/evaluation/voice_eval/scripts/voice_eval_seed_live_*/
+**/tensorboard/
+**/wandb/
+**/swanlog/
+**/dataloader_states/
+*.tfevents.*
+*.pid

@@ -1,0 +1,8 @@
+{
+  "audio_bos_token": "<|audio_bos|>",
+  "audio_eos_token": "<|audio_eos|>",
+  "audio_group_size": 5,
+  "audio_pad_token": "<|audio_pad|>",
+  "audio_token": "<|audio_pad|>",
+  "processor_class": "OmniDRCA2NextProcessor"
+}
