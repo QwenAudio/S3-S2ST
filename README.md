@@ -29,13 +29,16 @@ sudo apt-get install -y git ffmpeg libsndfile1 cmake ninja-build build-essential
 
 ### Inference environment
 
+Dependencies are defined in `pyproject.toml`, with `inference`, `train`, `eval` and `data` extras. For Conda setup, see the [environment guide](docs/ENVIRONMENT.md).
+
 The reference environment uses Python 3.12, NVIDIA PyTorch 2.7.0a0 (25.03), CUDA 12.8, torchaudio 2.6.0a0 and Triton 3.2.0. Use the NVIDIA PyTorch 25.03 container or a compatible CUDA/PyTorch base. The bundled vLLM Python code requires compiled vLLM kernels compatible with commit `6ac0cd370316e7c940d237e803b0eb8eda282f01`.
 
 ```bash
 python3.12 -m venv --system-site-packages envs/inference
+envs/inference/bin/python -m pip install --upgrade pip
 # Install your compatible compiled vLLM wheel before the Python dependencies.
 envs/inference/bin/python -m pip install "<path_to_compatible_vllm.whl>"
-PIP_CACHE_DIR="$PWD/cache/pip" envs/inference/bin/python -m pip install -r requirements-inference.txt
+PIP_CACHE_DIR="$PWD/cache/pip" envs/inference/bin/python -m pip install -e ".[inference]"
 source env.sh
 envs/inference/bin/python -c 'from vllm.engine.omnidrca2_engine import OmniDRCA2Engine; import onnxruntime'
 ```
@@ -46,10 +49,10 @@ Install CUDA-matched PyTorch/torchaudio, NVIDIA Apex, Transformer Engine and fla
 
 ```bash
 python3.10 -m venv envs/train
-envs/train/bin/python -m pip install -r requirements-training.txt
+envs/train/bin/python -m pip install -e ".[train]"
 
 python3.12 -m venv --system-site-packages envs/metrics
-envs/metrics/bin/python -m pip install -r requirements-metrics.txt
+envs/metrics/bin/python -m pip install -e ".[eval]"
 ```
 
 The launchers select their corresponding inference or metrics environment automatically. Activate `envs/train` for training. Set `PYTHON_BIN="<path_to_python>"` to use a different interpreter.

@@ -29,13 +29,16 @@ sudo apt-get install -y git ffmpeg libsndfile1 cmake ninja-build build-essential
 
 ### 推理环境
 
+依赖统一在 `pyproject.toml` 中维护，按用途安装 `inference`、`train`、`eval` 或 `data`。Conda 配置示例见[环境指南](docs/ENVIRONMENT.md)。
+
 参考环境为 Python 3.12、NVIDIA PyTorch 2.7.0a0（25.03）、CUDA 12.8、torchaudio 2.6.0a0 和 Triton 3.2.0。使用 NVIDIA PyTorch 25.03 容器或兼容的 CUDA/PyTorch 基础环境，执行以下命令。仓库自带的 vLLM Python 代码需要与提交 `6ac0cd370316e7c940d237e803b0eb8eda282f01` 兼容的编译内核。
 
 ```bash
 python3.12 -m venv --system-site-packages envs/inference
+envs/inference/bin/python -m pip install --upgrade pip
 # 先安装兼容的 vLLM 编译 wheel，再安装 Python 依赖。
 envs/inference/bin/python -m pip install "<path_to_compatible_vllm.whl>"
-PIP_CACHE_DIR="$PWD/cache/pip" envs/inference/bin/python -m pip install -r requirements-inference.txt
+PIP_CACHE_DIR="$PWD/cache/pip" envs/inference/bin/python -m pip install -e ".[inference]"
 source env.sh
 envs/inference/bin/python -c 'from vllm.engine.omnidrca2_engine import OmniDRCA2Engine; import onnxruntime'
 ```
@@ -46,10 +49,10 @@ envs/inference/bin/python -c 'from vllm.engine.omnidrca2_engine import OmniDRCA2
 
 ```bash
 python3.10 -m venv envs/train
-envs/train/bin/python -m pip install -r requirements-training.txt
+envs/train/bin/python -m pip install -e ".[train]"
 
 python3.12 -m venv --system-site-packages envs/metrics
-envs/metrics/bin/python -m pip install -r requirements-metrics.txt
+envs/metrics/bin/python -m pip install -e ".[eval]"
 ```
 
 启动脚本自动选择对应的推理或评测环境。训练前激活 `envs/train`；使用其他解释器时设置 `PYTHON_BIN="<path_to_python>"`。

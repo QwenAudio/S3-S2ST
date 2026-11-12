@@ -1,0 +1,102 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "s3-s2st"
+version = "0.1.0"
+description = "Semantically supervised streaming speech-to-speech translation"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+
+[project.urls]
+Repository = "https://github.com/QwenAudio/S3-S2ST"
+Paper = "https://arxiv.org/abs/2610.36777"
+HuggingFace = "https://huggingface.co/zhaoyx39/S3-S2ST"
+ModelScope = "https://modelscope.cn/models/zhaoyx239/S3-S2ST"
+
+[project.optional-dependencies]
+inference = [
+    "numpy==1.26.4",
+    "transformers==5.3.0",
+    "safetensors==0.5.3",
+    "onnxruntime==1.28.0",
+    "omegaconf==2.3.0",
+    "hydra-core==1.3.2",
+    "einops==0.8.2",
+    "rotary-embedding-torch==0.8.9",
+    "soundfile",
+    "librosa",
+    "sentencepiece",
+    "PyYAML",
+    "oss2==2.19.1",
+    "modelscope",
+    "funasr",
+    "kaldiio",
+    "tiktoken",
+    "tqdm",
+]
+
+train = [
+    "numpy==1.26.4",
+    "transformers==4.57.3",
+    "safetensors",
+    "zarr==2.18.3",
+    "numcodecs==0.13.1",
+    "tensorstore==0.1.76",
+    "omegaconf==2.3.0",
+    "hydra-core==1.3.2",
+    "einops",
+    "rotary-embedding-torch",
+    "soundfile",
+    "librosa",
+    "sentencepiece",
+    "PyYAML",
+    "oss2==2.19.1",
+    "modelscope",
+    "kaldiio",
+    "tensorboard",
+    "packaging",
+    "tqdm",
+]
+
+eval = [
+    "numpy==1.26.4",
+    "transformers==4.57.3",
+    "unbabel-comet==2.2.7",
+    "openai-whisper",
+    "funasr",
+    "modelscope",
+    "soundfile",
+    "librosa",
+    "jiwer==3.1.0",
+    "rapidfuzz==3.14.1",
+    "kaldifst==1.7.17",
+    "zhon",
+    "zhconv",
+    "sacrebleu",
+    "sentencepiece",
+    "pandas",
+    "scipy",
+    "PyYAML",
+    "pytorch-lightning==2.5.1",
+    "torchmetrics==0.10.3",
+    "huggingface-hub==0.36.2",
+    "omegaconf==2.3.0",
+    "hydra-core==1.3.2",
+    "antlr4-python3-runtime==4.9.3",
+    "torch-complex==0.4.4",
+    "tqdm",
+]
+
+data = [
+    "datasets",
+    "soundfile",
+    "huggingface-hub",
+]
+
+[tool.setuptools]
+packages = []
+py-modules = []
+include-package-data = false
