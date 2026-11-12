@@ -35,7 +35,7 @@ fi
 export PYTHON_BIN=${PYTHON_BIN:-python}
 export PYTHONPATH="${EXP_DIR}/runtime:${S3_ROOT}/training/offline/config/code_snapshot:${S3_ROOT}/training/offline_base/config/code_snapshot:${S3_ROOT}/vendor/offline_funasr:${S3_ROOT}/vendor/FunASR:${S3_ROOT}/code/megatron:${PYTHONPATH:-}"
 export TRAIN_SCRIPT="$root/config/pretrain_fun_base_talkerpackiso.py"
-export DATASET_CONFIG_PATH=${DATASET_CONFIG_PATH:-$root/config/megatron_fun_sft_4b_s2st_talkerpackiso.8192.yaml}
+export DATASET_CONFIG_PATH=${DATASET_CONFIG_PATH:-$root/config/dataset.yaml}
 export S2ST_TRAIN_STAGE=tts TEXT_LOSS_WEIGHT=0.0
 export LR=${LR:-5e-6} S2ST_BRIDGE_LR_SCALE=20.0
 if [[ "$stage" == e2e ]]; then

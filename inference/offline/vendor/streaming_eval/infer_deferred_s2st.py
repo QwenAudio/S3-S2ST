@@ -1088,7 +1088,7 @@ class StreamingS2STBackend:
             talker_args,
             thinker_visible_devices=args.thinker_devices,
             talker_visible_devices=args.talker_devices,
-            codec_embed_path=self.model_dir / "cosyvoice_codec_embed.pt",
+            codec_embed_path=self.model_dir / "talker_codec_embed.pt",
         )
         # The installed aligned-Talker engine consumes this request-scoped BOS
         # prefix map but its base constructor does not create it.  The legacy

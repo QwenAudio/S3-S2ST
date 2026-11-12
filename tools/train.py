@@ -42,7 +42,7 @@ if stage!='offline':
  cmd=['bash',str(out/'run_train.sh')]
 else:
  import yaml
- cfg=yaml.safe_load((ROOT/'training/offline/config/dataset_v4.yaml').read_text().replace('${S3_ROOT}', str(ROOT)));cfg['train_data_set_list']=str(train);cfg['valid_data_set_list']=str((a.valid_list or train).resolve())
+ cfg=yaml.safe_load((ROOT/'training/offline/config/dataset.yaml').read_text().replace('${S3_ROOT}', str(ROOT)));cfg['train_data_set_list']=str(train);cfg['valid_data_set_list']=str((a.valid_list or train).resolve())
  cfgpath=out/'dataset.yaml';cfgpath.write_text(yaml.safe_dump(cfg,allow_unicode=True));env['DATASET_CONFIG_PATH']=str(cfgpath)
  env['NNODES']=os.environ.get('NNODES','4');env['NODE_RANK']=os.environ.get('NODE_RANK','0');env['NPROC_PER_NODE']=os.environ.get('NPROC_PER_NODE','8')
  env['DRY_RUN']='1' if a.prepare_only else '0';cmd=['bash',str(ROOT/'training/offline/scripts/run.sh')]

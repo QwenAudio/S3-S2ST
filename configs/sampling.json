@@ -1,5 +1,5 @@
 {
-  "name": "talker_k5",
+  "name": "sampling",
   "thinker": {
     "temperature": 0,
     "top_k": 1,

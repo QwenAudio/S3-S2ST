@@ -111,7 +111,7 @@ def _load_cosyvoice_native_init_checkpoint(model, args):
         model.cosyvoice_fm.load_state_dict(fm_state_dict, strict=True)
         tensor_count = len(fm_state_dict)
         value_count = sum((tensor.numel() for tensor in fm_state_dict.values()))
-        print_rank_0(f'[MODEL INIT] pretrained FM load passed: tensors={tensor_count}, values={value_count:,}, epoch={fm_checkpoint.get('epoch', '<unknown>')}, step={fm_checkpoint.get('step', '<unknown>')}')
+        print_rank_0(f"[MODEL INIT] pretrained FM load passed: tensors={tensor_count}, values={value_count:,}, epoch={fm_checkpoint.get('epoch', '<unknown>')}, step={fm_checkpoint.get('step', '<unknown>')}")
         if fm_checkpoint_path != checkpoint_path:
             del fm_checkpoint
     del fm_state_dict, state_dict, checkpoint
@@ -591,7 +591,7 @@ def model_provider(pre_process=True, post_process=True):
                     frozen_codec_tensors += 1
                     frozen_codec_params += param.numel()
                     param.requires_grad = False
-        print_rank_0(f'[MODEL INIT] froze CosyVoice codex branch because cosyvoice_codex_loss_weight=0.0, fm_only={bool(getattr(args, 'cosyvoice_fm_only', False))}: tensors={frozen_codec_tensors}, parameters={frozen_codec_params:,}')
+        print_rank_0(f"[MODEL INIT] froze CosyVoice codex branch because cosyvoice_codex_loss_weight=0.0, fm_only={bool(getattr(args, 'cosyvoice_fm_only', False))}: tensors={frozen_codec_tensors}, parameters={frozen_codec_params:,}")
     if bool(getattr(args, 'cosyvoice_fm_only', False)):
         unexpected_trainable = [name for name, param in model.named_parameters() if param.requires_grad and (not name.startswith('cosyvoice_fm.'))]
         if unexpected_trainable:
@@ -641,7 +641,7 @@ def configure_cosyvoice_codex_from_dataset_config(args, audio_config):
             speech_token_extractor_conf['downsample_factor'] = 8 if tokenizer_frame_rate == 12.5 else 4
         audio_config.speech_token_extractor_conf = speech_token_extractor_conf
         automodel_conf = speech_token_extractor_conf.get('automodel_conf', {})
-        print_rank_0(f'Use speech_token_extractor_conf from FunASR YAML for main SpeechTokenizer: init_param={automodel_conf.get('init_param', None)}')
+        print_rank_0(f"Use speech_token_extractor_conf from FunASR YAML for main SpeechTokenizer: init_param={automodel_conf.get('init_param', None)}")
     codec_unit = int(model_conf.get('codec_unit', audio_config.tokenizer_code_book_size))
     loss_weight = float(os.environ.get('COSYVOICE_CODEX_LOSS_WEIGHT', llm_conf.get('loss_weight', 1.0)))
     audio_loss_weight = float(llm_conf.get('audio_loss_weight', 1.0))
@@ -1215,7 +1215,7 @@ def convert_batch_to_megatron(input_data, megatron_padding_id, megatron_tokenize
     try:
         input_ids_codec_text = build_codec_text_input_ids(input_data['labels_ids'], input_data.get('labels_ids_audio', None))
     except CodecTextRetokenizeError:
-        print(f'[BAD_CODEC_TEXT_SAMPLE] items={_codex_summarize_items(input_data.get('item'), limit=8)} data={_codex_data_summary(input_data)}', flush=True)
+        print(f"[BAD_CODEC_TEXT_SAMPLE] items={_codex_summarize_items(input_data.get('item'), limit=8)} data={_codex_data_summary(input_data)}", flush=True)
         raise
     sequence_chunks = [{'begin': 0, 'length': token_num_padded, 'offset': 0}]
     speech = input_data.get('speech', None)
@@ -1319,7 +1319,7 @@ class TrainIterator:
                 try:
                     batch = convert_batch_to_megatron(data, **self.kwargs)
                 except CodecTextRetokenizeError as exc:
-                    print(f'[SKIP_CODEC_TEXT_SAMPLE] reason={exc} epoch={self.epoch} data_split_i={self.data_split_i} step_in_split={self.step_in_split} step_in_epoch={self.step_in_epoch} total_steps={self.total_steps} items={_codex_summarize_items(data.get('item') if isinstance(data, dict) else None, limit=8)}', flush=True)
+                    print(f"[SKIP_CODEC_TEXT_SAMPLE] reason={exc} epoch={self.epoch} data_split_i={self.data_split_i} step_in_split={self.step_in_split} step_in_epoch={self.step_in_epoch} total_steps={self.total_steps} items={_codex_summarize_items(data.get('item') if isinstance(data, dict) else None, limit=8)}", flush=True)
                     continue
                 _codex_log_iterator_phase('train_iterator_convert_batch_to_megatron', time.time() - convert_start, batch, extra={'epoch': self.epoch, 'data_split_i': self.data_split_i, 'step_in_split': self.step_in_split, 'step_in_epoch': self.step_in_epoch, 'total_steps': self.total_steps, 'data_split_num': self.data_split_num, 'data_split_size': self.data_split_size})
                 return batch
@@ -1347,7 +1347,7 @@ def train_iterator(dataloader, **kwargs):
                 try:
                     data = convert_batch_to_megatron(data, **kwargs)
                 except CodecTextRetokenizeError as exc:
-                    print(f'[SKIP_CODEC_TEXT_SAMPLE] reason={exc} epoch={epoch} data_split_i={data_split_i} items={_codex_summarize_items(data.get('item') if isinstance(data, dict) else None, limit=8)}', flush=True)
+                    print(f"[SKIP_CODEC_TEXT_SAMPLE] reason={exc} epoch={epoch} data_split_i={data_split_i} items={_codex_summarize_items(data.get('item') if isinstance(data, dict) else None, limit=8)}", flush=True)
                     continue
                 yield data
 
@@ -1356,7 +1356,7 @@ def val_iterator(dataloader, **kwargs):
         try:
             data = convert_batch_to_megatron(data, **kwargs)
         except CodecTextRetokenizeError as exc:
-            print(f'[SKIP_CODEC_TEXT_SAMPLE] reason={exc} items={_codex_summarize_items(data.get('item') if isinstance(data, dict) else None, limit=8)}', flush=True)
+            print(f"[SKIP_CODEC_TEXT_SAMPLE] reason={exc} items={_codex_summarize_items(data.get('item') if isinstance(data, dict) else None, limit=8)}", flush=True)
             continue
         yield data
 

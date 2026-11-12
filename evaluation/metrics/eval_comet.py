@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""XCOMET-XL scoring, adapted from Hejia's S2TT evaluation script."""
+"""XCOMET-XL scoring, adapted from reference S2TT evaluation script."""
 
 import argparse
 import json

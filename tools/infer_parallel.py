@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Paper S2ST: offline gain -> 8 GPUs x N independent workers -> full metrics.
 Run with python3; boost_fleurs.py must sit alongside this script. Requires numpy/soundfile.
-Defaults preserve fixed05/FM8/source pacing, eight-layer fusion and paper sampling.
+Defaults preserve fixed-0.5/FM8/source pacing, eight-layer fusion and paper sampling.
 Concurrent wall-clock latency is NOT isolated single-request paper latency.
 """
 import argparse
@@ -141,7 +141,7 @@ def main():
         state('inference',workers=workers,samples=len(rows))
         def run(j):
             out=PAPER/'runs'/j['name'];(root/'runs'/j['name']).symlink_to(out)
-            cmd=['bash',str(ROOT/'scripts/infer.sh'),'--mode','streaming','--preset','fixed05','--model',str(args.model_hf),'--input',j['input'],'--output',str(out),'--gpu',str(j['gpu']),'--pool-worker','--kv-cache-gib',str(args.kv_gib)]
+            cmd=['bash',str(ROOT/'scripts/infer.sh'),'--mode','streaming','--preset','fixed-0.5','--model',str(args.model_hf),'--input',j['input'],'--output',str(out),'--gpu',str(j['gpu']),'--pool-worker','--kv-cache-gib',str(args.kv_gib)]
             # Stagger workers sharing one GPU to reduce simultaneous initialization spikes.
             time.sleep(20*(j['slot']//len(gpus)))
             with (root/'logs'/f"worker{j['slot']:02d}.log").open('w') as log:

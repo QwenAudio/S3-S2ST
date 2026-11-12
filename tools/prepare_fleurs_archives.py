@@ -4,7 +4,7 @@ import argparse
 p=argparse.ArgumentParser(description='Verify and extract pinned official FLEURS test archives using frozen paper manifest filenames')
 p.add_argument('--archive-dir',type=Path)
 a=p.parse_args()
-D=Path(__file__).resolve().parents[1];cache=a.archive_dir or D/'cache/downloads/fleurs_hf';meta=json.loads((D/'configs/fleurs_archive_verified.json').read_text());reports=[]
+D=Path(__file__).resolve().parents[1];cache=a.archive_dir or D/'cache/downloads/fleurs_hf';meta=json.loads((D/'configs/fleurs_archives.json').read_text());reports=[]
 for x in meta:
  lang=x['language'];direction='zh2en' if lang=='cmn_hans_cn' else 'en2zh';archive=cache/x['filename'];h=hashlib.sha256()
  with archive.open('rb') as f:

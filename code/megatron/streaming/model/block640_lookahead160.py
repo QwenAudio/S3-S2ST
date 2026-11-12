@@ -40,7 +40,7 @@ def _patch_true_streaming_adaptor(chunk_tokens: int) -> None:
     module = importlib.import_module(_ADAPTOR_MODULE_NAME)
     adaptor_cls = getattr(module, "AudioAdaptor", None)
     if adaptor_cls is not None and hasattr(adaptor_cls, "_streaming_attention_mask"):
-        # Hejia's 2026-08-20 stack has the production block-causal adaptor.
+        # reference stack has the production block-causal adaptor.
         # Rely on it directly instead of wrapping every attention call twice.
         print(
             "[TRUE STREAMING ADAPTOR] "
@@ -129,7 +129,7 @@ def install_true_streaming_encoder_module(streaming_root: Path) -> None:
     import megatron.core.models.multimodal  # noqa: F401
 
     # Older offline stacks predate these fields, so retain class-level defaults
-    # only for those stacks.  Newer Hejia dataclasses have instance fields whose
+    # only for those stacks.  Newer reference dataclasses have instance fields whose
     # generated __init__ defaults cannot be changed by assigning the class
     # attribute after class creation; the launcher must pass the real CLI flag.
     dataclass_fields = getattr(AudioConfig, "__dataclass_fields__", {})
@@ -220,6 +220,6 @@ def register_encoder_weight_overlay(model, streaming_root: Path) -> None:
         )
     print(
         "[BLOCK640 LOOKAHEAD160 ENCODER] preserving offline parent encoder weights; "
-        "no Hejia streaming encoder overlay",
+        "no reference streaming encoder overlay",
         flush=True,
     )

@@ -1,9 +1,9 @@
 {
-  "latency_fixed01": {
+  "latency_fixed-0.1": {
     "base": 0.1,
     "cap": 0.1
   },
-  "latency_dynamic099": {
+  "latency_adaptive": {
     "base": 0.1,
     "cap": 0.99,
     "saturation": 1.0,
@@ -28,9 +28,9 @@
     "speaker": "full_source_capped_10s",
     "note": "preserve the actual offline main-table rendering protocol"
   },
-  "default": "dynamic099",
-  "historical_control": "fixed05",
-  "historical_fixed05": {
+  "default": "adaptive",
+  "historical_control": "fixed-0.5",
+  "historical_fixed-0.5": {
     "base": 0.5,
     "cap": 0.5,
     "fm_chunk": 8,

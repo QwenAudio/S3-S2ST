@@ -1,5 +1,5 @@
 """Deliver an existing finished callback even when its token count is unchanged.
-Transport-only fix, local to this experiment process; no external file mutation.
+Patch the terminal callback in the current process.
 """
 import hashlib, inspect, textwrap, types, queue, contextlib
 from pathlib import Path

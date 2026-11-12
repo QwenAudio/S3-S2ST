@@ -2,14 +2,13 @@
 set -euo pipefail
 
 repo_root=${S3_ROOT}/code/megatron
-workspace_root=/path/to/Qwen-public-0803-hejia
+workspace_root=/path/to/S3-S2ST
 isolated_config_dir=${S3_ROOT}/training/offline_base/config
 source_checkpoint=${SOURCE_CHECKPOINT:-/path/to/iter_0001600}
 checkpoint_view=${workspace_root}/artifacts/4b_s2st/checkpoint_view
 fm_init=${COSYVOICE_FM_INIT_CKPT:-/path/to/epoch_276_step_2209.pth}
 dataset_config=${DATASET_CONFIG_PATH:-${repo_root}/scripts/sft/fun/conf/megatron_fun_sft_4b_s2st_0803_e2e_pretrained.8192.yaml}
 packed_list=$("${PYTHON_BIN:-python3}" -c 'import sys,yaml; print(yaml.safe_load(open(sys.argv[1]))["train_data_set_list"])' "$dataset_config")
-oss_credential_source=${OSS_CREDENTIAL_SOURCE:-${repo_root}/test/run_debug_local_dense_dc_online_sft.sh}
 
 for required in "${fm_init}" "${dataset_config}" "${packed_list}"; do
     if [[ ! -e "${required}" ]]; then
@@ -18,19 +17,13 @@ for required in "${fm_init}" "${dataset_config}" "${packed_list}"; do
     fi
 done
 
-# Match the proven 8B S2TT launch environment. Non-interactive SSH jobs do not
-# inherit the caller's OSS credentials, so, only when they are absent, import
-# the three credential exports from an existing target-local training script.
-# The values remain process-local: they are never printed or copied to a new
-# file. Callers can provide their own environment or override the read-only
-# source with OSS_CREDENTIAL_SOURCE.
-# Local project data needs no object-store credentials.
+# Optional object-store settings are supplied by the caller.
 export OSS_ACCESS_KEY_ID OSS_ACCESS_KEY_SECRET
 [[ -z "${OSS_SESSION_TOKEN:-}" ]] || export OSS_SESSION_TOKEN
-export OSS_ENDPOINT=${OSS_ENDPOINT:-oss-cn-shanghai-internal.aliyuncs.com}
+export OSS_ENDPOINT=${OSS_ENDPOINT:-}
 export OSS_REGION=${OSS_REGION:-cn-shanghai}
 export OSS_BUCKET_NAME=${OSS_BUCKET_NAME:-example-storage-1}
-export OSS_ENDPOINT_SH=${OSS_ENDPOINT_SH:-oss-cn-shanghai-internal.aliyuncs.com}
+export OSS_ENDPOINT_SH=${OSS_ENDPOINT_SH:-}
 export OSS_REGION_SH=${OSS_REGION_SH:-cn-shanghai}
 export OSS_BUCKET_NAME_SH=${OSS_BUCKET_NAME_SH:-example-storage-4}
 

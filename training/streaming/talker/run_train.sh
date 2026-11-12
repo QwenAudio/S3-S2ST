@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-export EXP_NAME=streaming_v7_wer6500h_dualinit_talker5k_e2e5k_20261008_talker
+export EXP_NAME=streaming_talker
 export EXP_DIR=${EXP_DIR:?use scripts/train.sh}
 export STREAMING_S2ST_THINKER_LAYER_FUSION=${STREAMING_S2ST_THINKER_LAYER_FUSION:-1}
 export STREAMING_S2ST_THINKER_LAYER_STRIDE=4

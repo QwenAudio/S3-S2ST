@@ -12,13 +12,13 @@ With a compatible base environment:
 
 ```bash
 cd "<path_to_S3-S2ST>"
-python3.12 -m venv --system-site-packages envs/inference312
-PIP_CACHE_DIR="$PWD/cache/pip" envs/inference312/bin/python -m pip install -r requirements-inference.txt
+python3.12 -m venv --system-site-packages envs/inference
+PIP_CACHE_DIR="$PWD/cache/pip" envs/inference/bin/python -m pip install -r requirements-inference.txt
 source env.sh
-envs/inference312/bin/python -c 'from vllm.engine.omnidrca2_engine import OmniDRCA2Engine; import onnxruntime'
+envs/inference/bin/python -c 'from vllm.engine.omnidrca2_engine import OmniDRCA2Engine; import onnxruntime'
 ```
 
-`scripts/infer.sh` chooses `envs/inference312` when present. Otherwise activate a compatible environment or set `PYTHON_BIN="<path_to_python>"`. Each run uses its own compiler caches; abstract Unix sockets support shared filesystems.
+`scripts/infer.sh` chooses `envs/inference` when present. Otherwise activate a compatible environment or set `PYTHON_BIN="<path_to_python>"`. Each run uses its own compiler caches; abstract Unix sockets support shared filesystems.
 
 ## Training
 
@@ -35,8 +35,8 @@ Use this Megatron fork and compile its fused kernels against the same PyTorch/CU
 ## Metrics and validation
 
 ```bash
-python3.12 -m venv --system-site-packages envs/metrics312
-envs/metrics312/bin/python -m pip install -r requirements-metrics.txt
+python3.12 -m venv --system-site-packages envs/metrics
+envs/metrics/bin/python -m pip install -r requirements-metrics.txt
 python tools/check_release.py
 ```
 

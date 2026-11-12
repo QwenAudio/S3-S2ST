@@ -669,7 +669,7 @@ class SenseVoiceEncoder(MegatronModule):
         if self.pre_process:
             x = x.permute(0, 2, 1) # [b, t, d] -> [b, d, t]
             if self.streaming:
-                # Match Hejia's 2026-08-20 streaming encoder exactly: preserve
+                # Match reference streaming encoder exactly: preserve
                 # output stride/length while eliminating convolutional future
                 # context with left-only padding.
                 x = F.pad(x, (self.conv1.conv.kernel_size[0] - 1, 0))

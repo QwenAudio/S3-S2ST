@@ -1,4 +1,4 @@
-"""Offline full-source S2ST using the audited explicit codec-feedback engine."""
+"""Offline full-source S2ST using the streaming explicit codec-feedback engine."""
 _S3_ROOT = next((p for p in __import__('pathlib').Path(__file__).resolve().parents if (p / 'env.sh').is_file() and (p / 'tools').is_dir()))
 import argparse, json, os, sys, hashlib, traceback, fcntl, time
 from pathlib import Path
@@ -16,19 +16,19 @@ if _model:
     os.environ['OFFLINE_LAYER_FUSION'] = '1' if _fusion['enabled'] else '0'
 from port_allocator import install as _install_ports
 _install_ports()
-import infer_deferred_s2st as audited
+import infer_deferred_s2st as streaming
 from terminal_delivery import install as _install_terminal_delivery
 _install_terminal_delivery()
 from pcm_runtime import PCMRuntime
 import inspect, textwrap
-_orig = audited.CodecHistoryReplayEngine._listen_talker
+_orig = streaming.CodecHistoryReplayEngine._listen_talker
 _src = inspect.getsource(_orig)
 _needle = '                                self._global_codec_tokens.append(token)'
 assert _src.count(_needle) == 1
 _src = _src.replace(_needle, _needle + '\n                                self._s3_pcm.on_codec(token)')
 _ns = {}
 exec(compile(textwrap.dedent(_src), __file__, 'exec'), _orig.__globals__, _ns)
-audited.CodecHistoryReplayEngine._listen_talker = _ns['_listen_talker']
+streaming.CodecHistoryReplayEngine._listen_talker = _ns['_listen_talker']
 
 def main():
     p = argparse.ArgumentParser()
@@ -62,14 +62,14 @@ def main():
     import torch
     torch.manual_seed(a.seed)
     np.random.seed(a.seed)
-    import infer_deferred_s2st as audited
+    import infer_deferred_s2st as streaming
     from transformers import AutoTokenizer
     from vllm.v1.engine.async_llm import AsyncEngineArgs
     from forced_sequence_logits import ForcedSequenceLogitsProcessor
-    encoder = audited.s2tt.FullRecordEncoder(Path(a.model), a.encoder_device, true_streaming=False)
-    encoder.processor._frontend = audited.s2tt.VllmWhisperFrontend(fs=16000, n_mels=128, do_pad_trim=False, filters_path=audited.s2tt.MEL_FILTERS_PATH)
+    encoder = streaming.s2tt.FullRecordEncoder(Path(a.model), a.encoder_device, true_streaming=False)
+    encoder.processor._frontend = streaming.s2tt.VllmWhisperFrontend(fs=16000, n_mels=128, do_pad_trim=False, filters_path=streaming.s2tt.MEL_FILTERS_PATH)
 
-    class OfflineBackend(audited.StreamingS2STBackend):
+    class OfflineBackend(streaming.StreamingS2STBackend):
 
         def __init__(self):
             self.args = a
@@ -78,8 +78,8 @@ def main():
             self.im_end_id = int(self.tokenizer.convert_tokens_to_ids('<|im_end|>'))
             common = dict(model=a.model, trust_remote_code=True, dtype='bfloat16', tensor_parallel_size=1, distributed_executor_backend='mp', enforce_eager=True, enable_prefix_caching=False, enable_chunked_prefill=False, max_model_len=8192, max_num_seqs=1, block_size=16)
             mm = dict(limit_mm_per_prompt={'audio': 1}, enable_mm_embeds=True, skip_mm_profiling=True, enable_hidden_state_caching=False)
-            self.text_engine = audited.OmniDRCA2Engine(AsyncEngineArgs(**common, **mm, gpu_memory_utilization=0.23 if a.single_gpu else 0.55), thinker_visible_devices=[a.text_gpu])
-            self.s2st_engine = audited.CodecHistoryReplayEngine(AsyncEngineArgs(**common, **mm, gpu_memory_utilization=0.23 if a.single_gpu else 0.55, logits_processors=[ForcedSequenceLogitsProcessor]), AsyncEngineArgs(**common, gpu_memory_utilization=0.18 if a.single_gpu else 0.25, enable_prompt_embeds=True), thinker_visible_devices=[a.thinker_gpu], talker_visible_devices=[a.talker_gpu], codec_embed_path=self.model_dir / 'cosyvoice_codec_embed.pt')
+            self.text_engine = streaming.OmniDRCA2Engine(AsyncEngineArgs(**common, **mm, gpu_memory_utilization=0.23 if a.single_gpu else 0.55), thinker_visible_devices=[a.text_gpu])
+            self.s2st_engine = streaming.CodecHistoryReplayEngine(AsyncEngineArgs(**common, **mm, gpu_memory_utilization=0.23 if a.single_gpu else 0.55, logits_processors=[ForcedSequenceLogitsProcessor]), AsyncEngineArgs(**common, gpu_memory_utilization=0.18 if a.single_gpu else 0.25, enable_prompt_embeds=True), thinker_visible_devices=[a.thinker_gpu], talker_visible_devices=[a.talker_gpu], codec_embed_path=self.model_dir / 'talker_codec_embed.pt')
             self.codec_eos_id = 59050
             self.codec_bos_id = 59049
             self.codec_final_bos_id = 59049
@@ -141,7 +141,7 @@ def main():
             def read_audio(i):
                 started = time.perf_counter()
                 obj = rows[i] if i >= 0 else warmups[i + len(warmups)]
-                wav_path, task, source, reference = audited.s2tt.load_row(obj)
+                wav_path, task, source, reference = streaming.s2tt.load_row(obj)
                 user = next((m for m in obj['messages'] if m['role'] == 'user'))
                 wav = load_source(wav_path, duration=(user.get('start_time', 0), user.get('end_time')))
                 return (wav_path, task, source, reference, wav, time.perf_counter() - started)
@@ -157,7 +157,7 @@ def main():
                 pcm.fix_speaker()
                 embeds = encoder(wav)
                 encoded_at = time.perf_counter()
-                prompt, segments = audited.s2tt.build_prompt(audited.s2tt.SYSTEM, task, embeds, [], open_for_write=True)
+                prompt, segments = streaming.s2tt.build_prompt(streaming.s2tt.SYSTEM, task, embeds, [], open_for_write=True)
                 backend.start_sample()
                 backend.set_write_context(final_write=True)
                 text = backend.generate_text(prompt, segments)
@@ -178,7 +178,7 @@ def main():
                 if not len(codec) and generation['status'] != 'empty_audio' or np.any(codec < 0) or np.any(codec >= 59049):
                     raise RuntimeError('Invalid acoustic codec')
                 codec_at = time.perf_counter()
-                key = audited.s2tt.make_key(wav_path, i)
+                key = streaming.s2tt.make_key(wav_path, i)
                 cd = out / ('warmup_codec' if i < 0 else 'codec')
                 cd.mkdir(exist_ok=True)
                 cp = cd / f'{key}.npy'

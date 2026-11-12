@@ -2,7 +2,7 @@
 set -euo pipefail
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 base=${S3_ROOT}/training/offline_base
-v4=${S3_ROOT}/data/train
+offline=${S3_ROOT}/data/train
 export PYTHON_BIN=${PYTHON_BIN:-python}
 export NNODES=${NNODES:-1} NODE_RANK=${NODE_RANK:-0} NPROC_PER_NODE=${NPROC_PER_NODE:-8}
 export GLOBAL_BATCH_SIZE=64 MICRO_BATCH_SIZE=1
@@ -40,13 +40,13 @@ export COSYVOICE_TTS_INIT_CKPT=${S3_ROOT}/models/training/talker_native.pth
 export COSYVOICE_FM_INIT_CKPT=$COSYVOICE_TTS_INIT_CKPT
 export DATALOADER_STATE_DIR="$EXP_DIR/dataloader_states" TENSORBOARD_DIR="$EXP_DIR/tensorboard"
 export NVTE_FUSED_ATTN=0 NVTE_FLASH_ATTN=1 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-export EXP_NAME=qwen3_5_4b_s2st_offline_v4_no9pair_scale_from5k_1epoch_20260923
+export EXP_NAME=offline
 if [[ $RESUME_TRAINING == 1 ]]; then
  export INIT_CKPT_DIR="$EXP_DIR"
- [[ -f "$EXP_DIR/latest_checkpointed_iteration.txt" && -d "$DATALOADER_STATE_DIR" && -f "$EXP_DIR/run_contract.json" ]] || { echo 'No complete v4 run to resume.' >&2; exit 2; }
+ [[ -f "$EXP_DIR/latest_checkpointed_iteration.txt" && -d "$DATALOADER_STATE_DIR" && -f "$EXP_DIR/run_contract.json" ]] || { echo 'No complete offline run to resume.' >&2; exit 2; }
 else
  export INIT_CKPT_DIR="${S3_INIT_CKPT:?}"
- [[ ! -f "$EXP_DIR/latest_checkpointed_iteration.txt" ]] || { echo 'Existing v4 checkpoint: use RESUME_TRAINING=1.' >&2; exit 2; }
+ [[ ! -f "$EXP_DIR/latest_checkpointed_iteration.txt" ]] || { echo 'Existing offline checkpoint: use RESUME_TRAINING=1.' >&2; exit 2; }
  if [[ -d "$DATALOADER_STATE_DIR" ]] && [[ -n $(find "$DATALOADER_STATE_DIR" -type f -print -quit) ]]; then
   echo 'Refusing fresh data traversal with existing loader states; use a fresh EXP_DIR.' >&2; exit 2
  fi
@@ -57,5 +57,5 @@ if [[ $DRY_RUN != 1 ]]; then
  flock -n 9 || { echo 'This node rank is already running.' >&2; exit 2; }
  "$PYTHON_BIN" "$root/scripts/contract.py"
 fi
-printf 'v4 new-stage steps=%s, GBS=%s, nodes=%s, node_rank=%s, source=iter_0005000, resume_v4=%s\n' "$TRAIN_ITERS" "$GLOBAL_BATCH_SIZE" "$NNODES" "$NODE_RANK" "$RESUME_TRAINING"
+printf 'offline new-stage steps=%s, GBS=%s, nodes=%s, node_rank=%s, source=iter_0005000, resume=%s\n' "$TRAIN_ITERS" "$GLOBAL_BATCH_SIZE" "$NNODES" "$NODE_RANK" "$RESUME_TRAINING"
 exec bash "$root/config/run_backend.sh"

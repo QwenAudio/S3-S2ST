@@ -15,6 +15,7 @@ def main():
  'HuggingFace token':r'\bhf_[A-Za-z0-9]{25,}\b',
  'GitHub token':r'\b(?:ghp_|github_pat_)[A-Za-z0-9_]{25,}\b',
  'private key':r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----',
+ 'environment credential':r'''(?im)os\.environ\[\s*["'][^"']*(?:KEY|TOKEN|SECRET|PASSWORD)[^"']*["']\s*\]\s*=\s*["'][A-Za-z0-9+/=_-]{16,}["']''',
  'literal credential':r'''(?im)(?:access_?key(?:_?id|_?secret)?|secret_?key|api_?key|auth_?token|password|passwd)\s*[:=]\s*["']([A-Za-z0-9+/=_-]{16,})["']'''}
  for n in files:
   f=ROOT/n

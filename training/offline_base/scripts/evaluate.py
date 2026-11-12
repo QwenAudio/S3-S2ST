@@ -4,7 +4,7 @@ import argparse, hashlib, json, os, shutil, subprocess, sys, traceback
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CODE = ROOT / 'vendor/streaming_eval'
-BASE = Path('/path/to/Qwen-public-0803-hejia')
+BASE = Path('/path/to/S3-S2ST')
 MP = '/path/to/python'
 
 def load_oss_env():

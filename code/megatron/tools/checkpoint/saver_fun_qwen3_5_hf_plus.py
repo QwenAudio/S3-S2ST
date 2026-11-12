@@ -400,10 +400,10 @@ def save_checkpoint(queue, args):
     if cosyvoice_codex_state is not None:
         config["cosyvoice_codex"] = {
             "enabled": True,
-            "llm_file": "cosyvoice_llm.pt",
-            "input_proj_file": "cosyvoice_llm_input_proj.pt",
-            "codec_embed_file": "cosyvoice_codec_embed.pt",
-            "codec_head_file": "cosyvoice_llm_codec_head.pt",
+            "llm_file": "talker.pt",
+            "input_proj_file": "talker_input_proj.pt",
+            "codec_embed_file": "talker_codec_embed.pt",
+            "codec_head_file": "talker_codec_head.pt",
             "pre_matching_file": "pre_matching.pt",
             "codec_unit": cosyvoice_codex_state.get("codec_unit"),
             "codec_vocab_size": cosyvoice_codex_state.get("codec_vocab_size"),
@@ -465,18 +465,18 @@ def save_checkpoint(queue, args):
                       output_dir / "output_layer_audio.pt")
 
     if cosyvoice_codex_state is not None:
-        torch.save(cosyvoice_codex_state["cosyvoice_llm"], output_dir / "cosyvoice_llm.pt")
+        torch.save(cosyvoice_codex_state["cosyvoice_llm"], output_dir / "talker.pt")
         torch.save(
             cosyvoice_codex_state.get("cosyvoice_llm_input_proj", {}),
-            output_dir / "cosyvoice_llm_input_proj.pt",
+            output_dir / "talker_input_proj.pt",
         )
         torch.save(
             cosyvoice_codex_state["cosyvoice_codec_embed"],
-            output_dir / "cosyvoice_codec_embed.pt",
+            output_dir / "talker_codec_embed.pt",
         )
         torch.save(
             cosyvoice_codex_state["cosyvoice_llm_codec_head"],
-            output_dir / "cosyvoice_llm_codec_head.pt",
+            output_dir / "talker_codec_head.pt",
         )
         torch.save(
             cosyvoice_codex_state.get("cosyvoice_llm_input_proj", {}),

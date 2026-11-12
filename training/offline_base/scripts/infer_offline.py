@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Offline full-source S2ST using the audited explicit codec-feedback engine."""
+"""Offline full-source S2ST using the streaming explicit codec-feedback engine."""
 import argparse, json, os, sys, hashlib, traceback
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
@@ -15,7 +15,7 @@ if _model:
  _fusion=resolve(_model,mode='auto',profile='continuous')
  os.environ['OFFLINE_LAYER_FUSION']='1' if _fusion['enabled'] else '0'
 # Spawned vLLM workers re-import this module: register overrides there too.
-import infer_deferred_s2st as audited
+import infer_deferred_s2st as streaming
 from terminal_delivery import install as _install_terminal_delivery
 _install_terminal_delivery()
 
@@ -32,15 +32,15 @@ def main():
  os.environ.pop('VLLM_STREAM_GATE_PATH',None)
  import numpy as np
  import torch
- import infer_deferred_s2st as audited
+ import infer_deferred_s2st as streaming
  from transformers import AutoTokenizer
  from vllm.v1.engine.async_llm import AsyncEngineArgs
  from forced_sequence_logits import ForcedSequenceLogitsProcessor
  # Full-record offline training uses utterance-max Whisper normalization,
  # NOT the fixed-max streaming frontend. Both encoder and adaptor are noncausal.
- encoder=audited.s2tt.FullRecordEncoder(Path(a.model),a.encoder_device,true_streaming=False)
- encoder.processor._frontend=audited.s2tt.VllmWhisperFrontend(fs=16000,n_mels=128,do_pad_trim=False,filters_path=audited.s2tt.MEL_FILTERS_PATH)
- class OfflineBackend(audited.StreamingS2STBackend):
+ encoder=streaming.s2tt.FullRecordEncoder(Path(a.model),a.encoder_device,true_streaming=False)
+ encoder.processor._frontend=streaming.s2tt.VllmWhisperFrontend(fs=16000,n_mels=128,do_pad_trim=False,filters_path=streaming.s2tt.MEL_FILTERS_PATH)
+ class OfflineBackend(streaming.StreamingS2STBackend):
   def __init__(self):
    self.args=a;self.model_dir=Path(a.model)
    self.tokenizer=AutoTokenizer.from_pretrained(a.model,trust_remote_code=True)
@@ -49,11 +49,11 @@ def main():
       distributed_executor_backend='mp',enforce_eager=True,enable_prefix_caching=False,
       enable_chunked_prefill=False,max_model_len=8192,max_num_seqs=1,block_size=16)
    mm=dict(limit_mm_per_prompt={'audio':1},enable_mm_embeds=True,skip_mm_profiling=True,enable_hidden_state_caching=False)
-   self.text_engine=audited.OmniDRCA2Engine(AsyncEngineArgs(**common,**mm,gpu_memory_utilization=.55),thinker_visible_devices=[a.text_gpu])
-   self.s2st_engine=audited.CodecHistoryReplayEngine(
+   self.text_engine=streaming.OmniDRCA2Engine(AsyncEngineArgs(**common,**mm,gpu_memory_utilization=.55),thinker_visible_devices=[a.text_gpu])
+   self.s2st_engine=streaming.CodecHistoryReplayEngine(
      AsyncEngineArgs(**common,**mm,gpu_memory_utilization=.55,logits_processors=[ForcedSequenceLogitsProcessor]),
      AsyncEngineArgs(**common,gpu_memory_utilization=.25,enable_prompt_embeds=True),
-     thinker_visible_devices=[a.thinker_gpu],talker_visible_devices=[a.talker_gpu],codec_embed_path=self.model_dir/'cosyvoice_codec_embed.pt')
+     thinker_visible_devices=[a.thinker_gpu],talker_visible_devices=[a.talker_gpu],codec_embed_path=self.model_dir/'talker_codec_embed.pt')
    self.codec_eos_id=59050;self.codec_bos_id=59049;self.codec_final_bos_id=59049;self.codec_pause_id=59051
    self.codec_boundary_policy='unified_eos';self.codec_envelope=True;self.final_eos_only=False;self.codec_history_replay=False
    self.codec_blank_count=5;self.codec_alignment_mask_id=-60
@@ -89,18 +89,18 @@ def main():
   with (out/'raw.jsonl').open('a') as f:
    for i,obj in enumerate(rows):
     if i<len(completed):continue
-    wav_path,task,source,reference=audited.s2tt.load_row(obj)
+    wav_path,task,source,reference=streaming.s2tt.load_row(obj)
     from offline_audio import load_source
     user=next(m for m in obj['messages'] if m['role']=='user')
     wav=load_source(wav_path,duration=(user.get('start_time',0),user.get('end_time')))
     embeds=encoder(wav)
-    prompt,segments=audited.s2tt.build_prompt(audited.s2tt.SYSTEM,task,embeds,[],open_for_write=True)
+    prompt,segments=streaming.s2tt.build_prompt(streaming.s2tt.SYSTEM,task,embeds,[],open_for_write=True)
     backend.start_sample();backend.set_write_context(final_write=True)
     text=backend.generate_text(prompt,segments)
     if not text:raise RuntimeError('Empty Thinker output')
     codec,annotations,generation=generate_sample(backend,prompt,segments,text)
     if not len(codec) or np.any(codec<0) or np.any(codec>=59049):raise RuntimeError('Invalid acoustic codec')
-    key=audited.s2tt.make_key(wav_path,i);cp=out/'codec'/f'{key}.npy';ctrl=out/'codec'/f'{key}.control.npy'
+    key=streaming.s2tt.make_key(wav_path,i);cp=out/'codec'/f'{key}.npy';ctrl=out/'codec'/f'{key}.control.npy'
     np.save(cp,codec);np.save(ctrl,backend._global_codec_full)
     row=dict(generation_status=generation['status'],eos_observed=generation['eos_observed'],truncated=generation['truncated'],generation_error=generation['error'],index=i,key=key,wav=wav_path,source=source,reference=reference,prediction=text,
       codec_path=str(cp.resolve()),codec_control_path=str(ctrl.resolve()),codec_len=len(codec),

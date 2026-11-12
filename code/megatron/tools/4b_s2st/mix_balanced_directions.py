@@ -5,7 +5,7 @@ The input may be grouped by translation direction. Rows are distributed in
 round-robin order across output shards; because the global counts are exactly
 balanced, every output shard receives nearly identical counts from both
 directions. The normal S2ST packer subsequently shuffles each mixed shard
-before forming packed bins, matching Hejia's shuffle/split/pack ordering.
+before forming packed bins, matching reference shuffle/split/pack ordering.
 """
 
 import argparse

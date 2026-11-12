@@ -817,11 +817,7 @@ def main(args: argparse.Namespace):
             "\n".join(
                 [
                     f"#{(i + 1):3d}/{len(request_outputs):d}: "
-                    f"{
-                        repr(tokenizer.decode(output.outputs[0].token_ids))
-                        if output
-                        else None
-                    }, "
+                    f"{repr(tokenizer.decode(output.outputs[0].token_ids)) if output else None}, "
                     f"{output.outputs[0].token_ids if output else None}, "
                     f"{len(output.prompt_token_ids) if output else None} -> "
                     f"{len(output.outputs[0].token_ids) if output else None}, "

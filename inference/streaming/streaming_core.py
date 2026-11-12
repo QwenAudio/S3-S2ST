@@ -2,7 +2,7 @@
 """Closed-loop S2TT evaluation for the 640-ms Thinker READ/WRITE gate.
 
 In true-streaming mode the waveform is read once but exposed to the speech
-frontend as growing 640-ms prefixes.  Each frontend call uses Hejia's
+frontend as growing 640-ms prefixes.  Each frontend call uses reference
 block-causal encoder and only newly available adaptor embeddings (normally eight
 80-ms tokens) are appended to the Thinker.  This recomputes historical encoder
 states because the current encoder has no inference cache, but never exposes

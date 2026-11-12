@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 export EXP_DIR=${EXP_DIR:?use scripts/train.sh}
-export EXP_NAME=streaming_v7_wer6500h_dualinit_talker5k_e2e5k_20261008_e2e
+export EXP_NAME=streaming_e2e
 export TRAIN_STAGE=e2e
 export EXPERIMENT_ROOT=${S3_ROOT}/training/streaming
 export STREAMING_S2ST_TALKER_CKPT=${S3_ROOT}/checkpoints/offline/iter_0010000

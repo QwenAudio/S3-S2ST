@@ -16,7 +16,7 @@ config_template=${STREAMING_S2ST_CONFIG_TEMPLATE:-${s2st_root}/config/streaming_
 dataset_config=${DATASET_CONFIG_PATH:-${runtime_dir}/streaming_s2st_talker.yaml}
 packed_list=${TRAIN_DATA_LIST:?}
 valid_list=${VALID_DATA_LIST:-$TRAIN_DATA_LIST}
-INIT_CKPT_DIR=${INIT_CKPT_DIR:-${repo_root}/streaming/artifacts/experiments/qwen3_5_4b_true_streaming_joint_bidir_20k_from_s2tt12k_merged_full_h100_unweighted_tp2_lr5e6_gate1e4_gs01_5k}
+INIT_CKPT_DIR=${INIT_CKPT_DIR:-${S3_ROOT}/checkpoints/init_streaming_talker}
 talker_checkpoint=${S3_ROOT}/checkpoints/offline/iter_0010000
 
 
@@ -31,19 +31,13 @@ cp "${config_template}" "${dataset_config}"
 sed -i "s#\${S3_ROOT}#${S3_ROOT}#g" "${dataset_config}"
 sed -i -e "s#STREAMING_S2ST_TRAIN_LIST_PLACEHOLDER#${packed_list}#" -e "s#STREAMING_S2ST_VALID_LIST_PLACEHOLDER#${valid_list}#" "${dataset_config}"
 
-# Match the proven 8B S2TT launch environment. Non-interactive SSH jobs do not
-# inherit the caller's OSS credentials, so, only when they are absent, import
-# the three credential exports from an existing target-local training script.
-# The values remain process-local: they are never printed or copied to a new
-# file. Callers can provide their own environment or override the read-only
-# source with OSS_CREDENTIAL_SOURCE.
-# Local project data needs no object-store credentials.
+# Optional object-store settings are supplied by the caller.
 export OSS_ACCESS_KEY_ID OSS_ACCESS_KEY_SECRET
 [[ -z "${OSS_SESSION_TOKEN:-}" ]] || export OSS_SESSION_TOKEN
-export OSS_ENDPOINT=${OSS_ENDPOINT:-oss-cn-shanghai-internal.aliyuncs.com}
+export OSS_ENDPOINT=${OSS_ENDPOINT:-}
 export OSS_REGION=${OSS_REGION:-cn-shanghai}
 export OSS_BUCKET_NAME=${OSS_BUCKET_NAME:-example-storage-1}
-export OSS_ENDPOINT_SH=${OSS_ENDPOINT_SH:-oss-cn-shanghai-internal.aliyuncs.com}
+export OSS_ENDPOINT_SH=${OSS_ENDPOINT_SH:-}
 export OSS_REGION_SH=${OSS_REGION_SH:-cn-shanghai}
 export OSS_BUCKET_NAME_SH=${OSS_BUCKET_NAME_SH:-example-storage-4}
 
@@ -138,9 +132,9 @@ export STREAMING_S2ST_CODEC_ENVELOPE_BLANK_COUNT=5
 export STREAMING_S2ST_CODEC_INPUT_TOKEN_DROPOUT=0
 export TRAIN_SCRIPT="$EXP_DIR/runtime/pretrain_exact_codec.py"
 
-export EXP_NAME=${EXP_NAME:-qwen3_5_4b_true_streaming_s2st_talker_codec_envelope_from_joint5k_offline_talker4k}
+export EXP_NAME=${EXP_NAME:-streaming_talker}
 size_str="gpu${WORLD_SIZE}x${NPROC_PER_NODE}_tp${TP_SIZE}_pp1_cp1_ep1"
-export EXP_DIR=${EXP_DIR:-"${repo_root}/streaming/artifacts/experiments/${EXP_NAME}_${size_str}"}
+export EXP_DIR=${EXP_DIR:-"${S3_ROOT}/runs/${EXP_NAME}"}
 export TENSORBOARD_DIR=${TENSORBOARD_DIR:-${EXP_DIR}/tensorboard}
 export TORCHINDUCTOR_CACHE_DIR=${TORCHINDUCTOR_CACHE_DIR:-"${workspace_root}/artifacts/4b_s2st/cache/torchinductor"}
 export SWANLAB_PROJECT=${SWANLAB_PROJECT:-${EXP_NAME}}

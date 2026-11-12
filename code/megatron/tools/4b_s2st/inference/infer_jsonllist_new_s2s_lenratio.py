@@ -882,7 +882,7 @@ class Inference:
         try:
             data_dict = json.loads(line.strip())
             messages = data_dict["messages"]
-            # Packed training data uses ``text`` while Hejia's historical
+            # Packed training data uses ``text`` while reference historical
             # evaluation data uses ``content``.  Accept both so that a packed
             # sample can be replayed directly during train/infer smoke tests.
             user_content = messages[1].get("content", messages[1].get("text"))

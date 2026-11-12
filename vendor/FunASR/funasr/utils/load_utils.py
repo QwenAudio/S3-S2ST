@@ -85,7 +85,7 @@ class PathTransformer:
         return path
 
 
-oss_roots = ["/fun_resource_sh_cache", "/nls_spider_sh_cache", "/oss-fun-asr-train-data-shanghai"]
+oss_roots = ["/fun_resource_sh_cache", "/nls_spider_sh_cache", "/oss-example-storage-4"]
 PATH_TRANSFORMER = PathTransformer(oss_roots)
 
 
@@ -716,39 +716,3 @@ def parse_ffmpeg_duration(ffmpeg_log, raw_path):
     except Exception as e:
         # print(f"{raw_path}, Error parsing audio duration: {e}")
         return -1
-
-if __name__ == "__main__":
-    import os
-    from funasr.frontends.whisper_frontend import WhisperFrontend
-
-    frontend = WhisperFrontend(
-        fs=16000,
-        n_mels=128,
-        do_pad_trim=False,
-        filters_path="/mnt/data/yunjie.jyj.cpfs.speech/FunASR/external_reliance/SenseVoiceSANM/assets/mel_filters.npz"
-    )
-
-    data_or_path_or_list = "oss://example-storage-4/spider-data/aicheng/source/20250715/youtube/audio/ptLauJajknI.webm"
-    duration = [45.06, 46.12]
-    buckets = {}
-    endpoint = 'oss-cn-shanghai-internal.aliyuncs.com'
-    auth = oss2.ProviderAuthV4(EnvironmentVariableCredentialsProvider())
-    region = 'cn-shanghai'
-
-    os.environ['OSS_ACCESS_KEY_ID'] = ''
-    os.environ['OSS_ACCESS_KEY_SECRET'] = 'aDmOlzUt5Umq9K5fYLiiDfJFgsZilR'
-    os.environ['OSS_SESSION_TOKEN'] = ''
-    data_src = load_audio_text_image_video(data_or_path_or_list, duration=duration, buckets=buckets, endpoint=endpoint, auth=auth, region=region)
-    print (f'data_src shape: {data_src.shape}')
-    print (f'data_src: {data_src}')
-
-    speech, speech_lengths = extract_fbank(
-                            data_src,
-                            data_type='sound',
-                            frontend=frontend,
-                            is_final=True,
-                        )  # speech: [b, T, d]
-
-    print (f'speech shape: {speech.shape}')
-    print (f'speech: {speech}')
-    print (f'speech_lengths: {speech_lengths}')

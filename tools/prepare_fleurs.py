@@ -59,7 +59,7 @@ def main():
     write(out / 'smoke8.jsonl', manifests['zh2en'][:4] + manifests['en2zh'][:4])
     print('Manifests prepared: zh2en=945, en2zh=646', flush=True)
     if not a.manifests_only:
-        for spec in json.loads((ROOT / 'configs/fleurs_archive_verified.json').read_text()):
+        for spec in json.loads((ROOT / 'configs/fleurs_archives.json').read_text()):
             fetch(f"{base}/{spec['language']}/audio/test.tar.gz", cache / spec['filename'], spec['sha256'])
         subprocess.run([sys.executable,str(ROOT/'tools/prepare_fleurs_archives.py'),'--archive-dir',str(cache)], check=True)
 

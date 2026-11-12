@@ -1,10 +1,10 @@
 """Packed-sequence-safe causal convolution for the 4B GatedDeltaNet.
 
-The imported Hejia stack falls back to one depthwise ``F.conv1d`` over the
+The imported reference stack falls back to one depthwise ``F.conv1d`` over the
 entire packed bin when causal-conv1d is unavailable.  That convolution ignores
 ``cu_seqlens`` and leaks the last ``kernel_size - 1`` states of one example into
 the next.  This local implementation follows causal-conv1d's ``seq_idx``
-contract and keeps the external Hejia checkout read-only.
+contract and keeps the external reference checkout read-only.
 """
 
 from __future__ import annotations

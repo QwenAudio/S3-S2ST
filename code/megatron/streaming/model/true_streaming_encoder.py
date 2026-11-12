@@ -1,4 +1,4 @@
-"""Streaming-only integration for Hejia's 640-ms SenseVoice encoder.
+"""Streaming-only integration for reference 640-ms SenseVoice encoder.
 
 The offline source tree stays read-only.  When enabled, this module installs the
 vendored block-causal encoder implementation before ``pretrain_fun_base`` imports
@@ -40,7 +40,7 @@ def _patch_true_streaming_adaptor(chunk_tokens: int) -> None:
     module = importlib.import_module(_ADAPTOR_MODULE_NAME)
     adaptor_cls = getattr(module, "AudioAdaptor", None)
     if adaptor_cls is not None and hasattr(adaptor_cls, "_streaming_attention_mask"):
-        # Hejia's 2026-08-20 stack has the production block-causal adaptor.
+        # reference stack has the production block-causal adaptor.
         # Rely on it directly instead of wrapping every attention call twice.
         print(
             "[TRUE STREAMING ADAPTOR] "
@@ -129,7 +129,7 @@ def install_true_streaming_encoder_module(streaming_root: Path) -> None:
     import megatron.core.models.multimodal  # noqa: F401
 
     # Older offline stacks predate these fields, so retain class-level defaults
-    # only for those stacks.  Newer Hejia dataclasses have instance fields whose
+    # only for those stacks.  Newer reference dataclasses have instance fields whose
     # generated __init__ defaults cannot be changed by assigning the class
     # attribute after class creation; the launcher must pass the real CLI flag.
     dataclass_fields = getattr(AudioConfig, "__dataclass_fields__", {})
@@ -189,7 +189,7 @@ def install_true_streaming_encoder_module(streaming_root: Path) -> None:
     source = (
         streaming_root
         / "vendor"
-        / "hejia_true_streaming_encoder"
+        / "streaming_audio_encoder"
         / "audio_encoder.py"
     )
     if not source.is_file():
@@ -207,7 +207,7 @@ def install_true_streaming_encoder_module(streaming_root: Path) -> None:
 
 
 def register_encoder_weight_overlay(model, streaming_root: Path) -> None:
-    """Load Hejia weights after the user's full Thinker/MLP checkpoint."""
+    """Load reference weights after the user's full Thinker/MLP checkpoint."""
     if not enabled():
         return
     if os.environ.get("STREAMING_TRUE_ENCODER_OVERLAY", "1").lower() not in {
@@ -225,7 +225,7 @@ def register_encoder_weight_overlay(model, streaming_root: Path) -> None:
                 streaming_root
                 / "assets"
                 / "true_streaming_encoder"
-                / "hejia_iter8000_640ms"
+                / "streaming_encoder"
                 / "audio_encoder.pt"
             ),
         )

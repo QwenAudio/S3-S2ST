@@ -84,14 +84,24 @@ def main():
     group.add_argument('--repo-id', help='Hugging Face model repository, e.g. organization/model')
     group.add_argument('--local-dir', type=Path, help='Already downloaded model repository')
     parser.add_argument('--revision', default='main', help='HF branch or commit; pin a commit for reproducibility')
+    parser.add_argument('--subfolder', choices=['streaming', 'offline'],
+                        help='Model subdirectory when both variants share one Hub repository')
     parser.add_argument('--verify-only', action='store_true')
     args = parser.parse_args()
+    if args.subfolder and args.subfolder != args.mode:
+        parser.error('--subfolder must match --mode')
     source = args.local_dir
     if args.repo_id:
         os.environ['HF_HUB_OFFLINE'] = '0'
         from huggingface_hub import snapshot_download
-        source = Path(snapshot_download(repo_id=args.repo_id, revision=args.revision,
-                                       local_dir=ROOT / 'cache' / 'model_downloads' / args.mode))
+        source = Path(snapshot_download(
+            repo_id=args.repo_id, revision=args.revision,
+            allow_patterns=[args.subfolder + '/**'] if args.subfolder else None,
+            local_dir=ROOT / 'cache' / 'model_downloads' / args.mode))
+    if args.subfolder and (args.repo_id or not (source / 'release.json').is_file()):
+        source = source / args.subfolder
+    elif not (source / 'release.json').is_file() and (source / args.mode / 'release.json').is_file():
+        source = source / args.mode
     install(source, args.mode, verify_only=args.verify_only)
 
 

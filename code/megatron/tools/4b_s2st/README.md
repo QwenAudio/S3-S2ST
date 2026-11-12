@@ -3,24 +3,24 @@
 ```bash
 cd /path/to/megatron
 
-TRAIN_DIR=/path/to/qwen3_5_4b_s2st_v4_hejia1600_talker_joint_one_epoch_gbs64_gpu1x8_tp2_pp1_cp1_ep1
-TRAIN_NAME=qwen3_5_4b_s2st_v4_hejia1600_talker_joint_one_epoch_gbs64
-HEJIA_TALKER=/path/to/talker_native.pth
+TRAIN_DIR=/path/to/output
+TRAIN_NAME=offline
+TALKER_INIT_CKPT=/path/to/talker_native.pth
 ```
 
 ## 开始训练
 
-从 4B base + Hejia iter1600 Talker 开始，adapter 与 Talker 联训；global batch 64，约 1 epoch：
+从 4B base 与初始化 Talker 权重开始，adapter 与 Talker 联训；global batch 64，约 1 epoch：
 
 ```bash
 test ! -e "$TRAIN_DIR/latest_checkpointed_iteration.txt" || {
   echo "TRAIN_DIR 已有 checkpoint，请使用下面的断点续训命令"
   exit 1
 }
-TASK=.mcp-tasks/stage2_$(date +%Y%m%d_%H%M%S)
+TASK=runs/stage2_$(date +%Y%m%d_%H%M%S)
 nohup env \
   TTS_INIT_FROM_BASE=1 \
-  COSYVOICE_TTS_INIT_CKPT="$HEJIA_TALKER" \
+  COSYVOICE_TTS_INIT_CKPT="$TALKER_INIT_CKPT" \
   EXP_DIR="$TRAIN_DIR" \
   EXP_NAME="$TRAIN_NAME" \
   GAS_STEPS=8 LR=5e-6 TRAIN_ITERS=34929 \
@@ -47,7 +47,7 @@ pkill -TERM -f -- "--save ${TRAIN_DIR}"
 ## 断点续训
 
 ```bash
-TASK=.mcp-tasks/stage2_resume_$(date +%Y%m%d_%H%M%S)
+TASK=runs/stage2_resume_$(date +%Y%m%d_%H%M%S)
 nohup env \
   RESUME_TRAINING=1 \
   INIT_CKPT_DIR="$TRAIN_DIR" \

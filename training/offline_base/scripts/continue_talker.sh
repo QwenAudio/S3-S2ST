@@ -9,6 +9,6 @@ printf 'talker: resuming 5000 -> 10000; full evaluation on H100\n' > "$root/PIPE
 if bash "$root/scripts/train.sh" talker "$root/runs/talker/iter_0005000"; then
  printf 'talker: completed 10000; awaiting next stage decision\n' > "$root/PIPELINE_STATUS"
 else
- printf 'talker continuation failed; inspect audit/continue_talker_10k.log\n' > "$root/PIPELINE_FAILED"
+ printf 'talker continuation failed; inspect audit/continue_talker.log\n' > "$root/PIPELINE_FAILED"
  exit 1
 fi

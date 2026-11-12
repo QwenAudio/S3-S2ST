@@ -39,5 +39,5 @@ if a.verify_hashes:
    for block in iter(lambda:inp.read(8*1024*1024),b''):h.update(block)
   if h.hexdigest()!=expected:errors.append('hash mismatch '+name)
   checked+=1
-report=dict(status='PASS' if not errors else 'FAIL',pending_public_audio_downloads=len(pending_audio),pending_public_assets=pending_assets,public_benchmark_ready=not pending_audio and not pending_assets,errors=errors,hashes_checked=checked,gpu_inference_tested=(ROOT/'provenance/SHANGHAI_YUXIANG_RUNTIME_VALIDATION.json').exists(),private_training_data_included=False)
+report=dict(status='PASS' if not errors else 'FAIL',pending_public_audio_downloads=len(pending_audio),pending_public_assets=pending_assets,public_benchmark_ready=not pending_audio and not pending_assets,errors=errors,hashes_checked=checked,gpu_inference_tested=(ROOT/'provenance/runtime_validation.json').exists(),private_training_data_included=False)
 (ROOT/'provenance/AUDIT.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2));raise SystemExit(bool(errors))

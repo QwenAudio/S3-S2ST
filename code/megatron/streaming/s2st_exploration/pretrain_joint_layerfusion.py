@@ -2,7 +2,7 @@
 import json,os,warnings
 from pathlib import Path
 import torch
-from streaming.s2st_exploration import pretrain_streaming_s2st_e2e_segmentpad_0909 as baseline
+from streaming.s2st_exploration import pretrain_streaming_s2st_e2e_segmentpad as baseline
 from joint_layer_fusion import install_thinker_layer_fusion
 
 def model_provider(pre_process=True,post_process=True):
@@ -43,7 +43,7 @@ def model_provider(pre_process=True,post_process=True):
         root=Path(os.environ['EXP_DIR'])
         meta=dict(enabled=True,layers=list(fusion.layer_numbers),hidden_size=2560,parameter_key='thinker_layer_fusion.weights',
             hidden_convention='intermediate_post_block_final_post_norm',talker_profile='segmentpad',
-            initialization='all model weights from talker_layerfusion_0909/iter_0005000',
+            initialization='all model weights from preceding Talker stage',
             full_recompute='uniform_1; tap checkpoint outputs',trainable_parameters=trainable)
         (root/'layer_fusion_config.json').write_text(json.dumps(meta,indent=2)+'\n')
         args=baseline.joint.get_args()

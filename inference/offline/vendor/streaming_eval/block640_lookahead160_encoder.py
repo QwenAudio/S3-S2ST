@@ -1,6 +1,6 @@
 """Inference-only replica of the isolated block640-lookahead160 encoder.
 
-This module is separate from true_streaming_encoder.py so the historical Hejia
+This module is separate from true_streaming_encoder.py so the historical reference
 evaluation path remains byte-for-byte unchanged.
 """
 

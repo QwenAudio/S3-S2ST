@@ -162,17 +162,14 @@ model_conf:
               vocab_path: /path/to/multilingual.tiktoken
 dataset: MinMo_S2S_Channels_SFT_Pack_Mega
 dataset_conf:
-  # This node has mounts for example-storage-1/nls-spider, but not for
-  # fun-asr-train-data-shanghai. Rewriting that bucket to the absent
-  # /oss-fun-asr-train-data-shanghai path makes every audio record invalid.
-  # Keep the OSS URI intact and let prefetch_audio_to_local download it.
+  # Keep remote URIs intact for the audio prefetcher.
   use_oss_cache: false
   index_ds: MinMo_S2S_Channels_SFT_Pack_Lazy
   matterhorn_format: false
   batch_sampler: BatchSampler
   batch_type: example
   batch_size: 1
-  # Match Hejia: runtime order is deterministic because every offline-packed
+  # Runtime order is deterministic because every offline-packed
   # bin already mixes EN-ZH and ZH-EN after global mix -> split -> pack.
   shuffle: false
   sort_size: 512
@@ -216,7 +213,7 @@ tokenizer_conf:
 train_conf: {}
 
 # S2S packed data: assistant mode is "td" and assistant audio contains target speech codec token paths.
-# v4: all v2 train+valid plus EN/ZH FLEURS x10; added 9pair removed, surviving v3 pack order retained.
-train_data_set_list: data/train/offline.list
-# Empty loader compatibility placeholder; no held-out validation records.
-valid_data_set_list: data/train/valid.list
+# Preserve clean-v2 natural mixture; globally interleave packed bins into 256 shards.
+train_data_set_list: ${S3_ROOT}/training/offline_base/data/full_v2/train.list
+# Source-recording hash holdout; independent of the new training split.
+valid_data_set_list: ${S3_ROOT}/training/offline_base/data/full_v2/valid.list

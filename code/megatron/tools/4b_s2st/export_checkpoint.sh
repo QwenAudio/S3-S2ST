@@ -3,8 +3,8 @@ set -euo pipefail
 
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
 workspace_root=$(cd -- "${repo_root}/.." && pwd)
-mcore_dir=${1:-/path/to/iter_0001600}
-hf_dir=${2:-${workspace_root}/artifacts/4b_s2st/validation/iter_0001600_HF}
+mcore_dir=${1:-/path/to/checkpoint}
+hf_dir=${2:-${workspace_root}/artifacts/4b_s2st/validation/model}
 tokenizer=${S3_ROOT}/models/offline
 audio_encoder=/path/to/audio_encoder_only.pt
 python_bin=${PYTHON_BIN:-/path/to/python}
@@ -24,7 +24,7 @@ mkdir -p "$(dirname "${hf_dir}")"
 
 export CUDA_DEVICE_MAX_CONNECTIONS=1
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
-export PYTHONPATH="${workspace_root}/deps/python:${workspace_root}/deps/FunASR_0611:${PYTHONPATH:-}"
+export PYTHONPATH="${workspace_root}/deps/python:${workspace_root}/deps/FunASR:${PYTHONPATH:-}"
 export PYTHONDONTWRITEBYTECODE=1
 export Channels_Model=True
 export no_audio_emb_and_head=True

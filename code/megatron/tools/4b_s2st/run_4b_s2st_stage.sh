@@ -36,11 +36,11 @@ case "${stage}" in
             exit 2
         fi
         # Stage 2: adapt the bridge, TTS Transformer, and its codec-token I/O
-        # embedding/head, matching Hejia's Talker finetune.  The neural speech
+        # embedding/head, matching reference Talker finetune.  The neural speech
         # codec itself, the original 4B audio head, FM, and vocoder stay fixed.
         # A normal stage-to-stage load retains the learned bridge.  A direct
-        # Hejia-Talker initialization starts from the 4B base and intentionally
-        # creates a fresh 2560 -> 896 bridge, because Hejia's bridge is 2048 -> 896.
+        # reference-Talker initialization starts from the 4B base and intentionally
+        # creates a fresh 2560 -> 896 bridge, because reference bridge is 2048 -> 896.
         if [[ "${TTS_INIT_FROM_BASE:-0}" == 1 ]]; then
             export S2ST_PRESERVE_COSYVOICE_CHECKPOINT=0
         else

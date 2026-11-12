@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-def get_bucket(bucket_name, endpoint="https://oss-cn-wulanchabu-internal.aliyuncs.com", region="cn-wulanchabu"):
+def get_bucket(bucket_name, endpoint="https://oss-cn-wulanchabu.aliyuncs.com", region="cn-wulanchabu"):
     # 从环境变量中获取访问凭证。运行本代码示例之前，请确保已设置环境变量OSS_ACCESS_KEY_ID和OSS_ACCESS_KEY_SECRET。
     auth = oss2.ProviderAuthV4(EnvironmentVariableCredentialsProvider())
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Score keyed text files or Hejia ASR TSV with sacreBLEU."""
+"""Score keyed text files or reference ASR TSV with sacreBLEU."""
 
 import argparse
 import json
@@ -16,7 +16,7 @@ def main():
     ap.add_argument("--ref", type=Path, help="Keyed reference: <utt><TAB><text>.")
     ap.add_argument("--hyp", type=Path, help="Keyed hypothesis: <utt><TAB><text>.")
     ap.add_argument("--asr-tsv", type=Path,
-                    help="Hejia run_wer.py TSV; column 4 is the ASR hypothesis. "
+                    help="reference run_wer.py TSV; column 4 is the ASR hypothesis. "
                          "With --ref, use that keyed file as the BLEU reference.")
     ap.add_argument("--language", choices=("zh", "en"), required=True)
     ap.add_argument("--output", type=Path, required=True)

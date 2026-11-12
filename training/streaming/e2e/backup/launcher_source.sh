@@ -7,7 +7,7 @@ export CUDA_DEVICE_MAX_CONNECTIONS=1
 
 # fix the f*cking topo
 echo "Fixing NCCL topo ..."
-FIXED_TOPO_FILE=${S3_ROOT}/code/megatron/streaming/artifacts/experiments/talker_layerfusion_continuous_v3_0911/runtime/fixed_topo.xml
+FIXED_TOPO_FILE=${EXP_DIR}/runtime/fixed_topo.xml
 python ../../tools/fix_nccl_topo/fix_topo.py ${FIXED_TOPO_FILE}
 export NCCL_TOPO_FILE=${FIXED_TOPO_FILE}
 

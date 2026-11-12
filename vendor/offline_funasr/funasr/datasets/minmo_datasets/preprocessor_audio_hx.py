@@ -48,13 +48,13 @@ try:
     OSS_ACCESS_KEY_SECRET ="" # supply through the caller environment
 
     auth = oss2.ProviderAuthV4(EnvironmentVariableCredentialsProvider())
-    bucket_sh_spider = oss2.Bucket(auth, "oss-cn-shanghai-internal.aliyuncs.com", "example-storage-4",
+    bucket_sh_spider = oss2.Bucket(auth, os.environ.get("OSS_ENDPOINT", "https://oss-cn-shanghai.aliyuncs.com"), "example-storage-4",
                                    region="cn-shanghai")
-    bucket_sh_fun = oss2.Bucket(auth, "oss-cn-shanghai-internal.aliyuncs.com", "example-storage-1",
+    bucket_sh_fun = oss2.Bucket(auth, os.environ.get("OSS_ENDPOINT", "https://oss-cn-shanghai.aliyuncs.com"), "example-storage-1",
                                 region="cn-shanghai")
-    bucket_wlcb_spider = oss2.Bucket(auth, "oss-cn-wulanchabu-internal.aliyuncs.com", "example-storage-5",
+    bucket_wlcb_spider = oss2.Bucket(auth, os.environ.get("OSS_ENDPOINT_WLCB", "https://oss-cn-wulanchabu.aliyuncs.com"), "example-storage-5",
                                      region="cn-wulanchabu")
-    bucket_wlcb = oss2.Bucket(auth, "oss-cn-wulanchabu-internal.aliyuncs.com", "nls-resource-wulanchabu",
+    bucket_wlcb = oss2.Bucket(auth, os.environ.get("OSS_ENDPOINT_WLCB", "https://oss-cn-wulanchabu.aliyuncs.com"), os.environ.get("OSS_BUCKET_WLCB", "example-storage-5"),
                               region="cn-wulanchabu")
 
 

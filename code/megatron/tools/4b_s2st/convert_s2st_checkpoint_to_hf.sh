@@ -24,7 +24,7 @@ export COSYVOICE_TTS_INIT_FULL=1
 export COSYVOICE_TTS_INIT_CKPT="${native_tts_ckpt}"
 export COSYVOICE_FM_INIT_CKPT="${native_tts_ckpt}"
 
-bash "${repo_root}/tools/4b_s2st/convert_iter1600_to_hf.sh" "${mcore_iter_dir}" "${hf_dir}"
+bash "${repo_root}/tools/4b_s2st/export_checkpoint.sh" "${mcore_iter_dir}" "${hf_dir}"
 
 # The checkpoint converter saves model/tokenizer state, while the custom S2S
 # runtime also resolves its audio frontend through AutoProcessor.  Keep these

@@ -4,7 +4,7 @@ import warnings
 
 os.environ["STREAMING_DEBUG_DISABLE_GATE"] = "0"
 from streaming.s2st_exploration import pretrain_streaming_s2st_e2e as joint
-from streaming.s2st_exploration.pretrain_streaming_s2st_segment_padded_0907 import (
+from streaming.s2st_exploration.pretrain_streaming_s2st_segment_padded import (
     _install_talker_only_segment_padding,
     _install_codec_envelope_label_shift,
 )

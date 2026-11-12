@@ -2,7 +2,9 @@
 
 Semantically Supervised Streaming Speech-to-Speech Translation
 
-[arXiv](https://arxiv.org/abs/2610.36777) · Hugging Face: **Under review — Coming soon** · ModelScope: **Under review — Coming soon**
+[![arXiv](https://img.shields.io/badge/arXiv-2610.36777-b31b1b?style=flat-square&logo=arxiv)](https://arxiv.org/abs/2610.36777)
+[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Models-FFD21E?style=flat-square&logo=huggingface&logoColor=black)](https://huggingface.co/zhaoyx39/S3-S2ST)
+[![ModelScope](https://img.shields.io/badge/ModelScope-Models-624AFF?style=flat-square)](https://modelscope.cn/models/zhaoyx239/S3-S2ST)
 
 [中文](README.zh-CN.md)
 
@@ -32,12 +34,12 @@ sudo apt-get install -y git ffmpeg libsndfile1 cmake ninja-build build-essential
 The reference environment uses Python 3.12, NVIDIA PyTorch 2.7.0a0 (25.03), CUDA 12.8, torchaudio 2.6.0a0 and Triton 3.2.0. Use the NVIDIA PyTorch 25.03 container or a compatible CUDA/PyTorch base. The bundled vLLM Python code requires compiled vLLM kernels compatible with commit `6ac0cd370316e7c940d237e803b0eb8eda282f01`.
 
 ```bash
-python3.12 -m venv --system-site-packages envs/inference312
+python3.12 -m venv --system-site-packages envs/inference
 # Install your compatible compiled vLLM wheel before the Python dependencies.
-envs/inference312/bin/python -m pip install "<path_to_compatible_vllm.whl>"
-PIP_CACHE_DIR="$PWD/cache/pip" envs/inference312/bin/python -m pip install -r requirements-inference.txt
+envs/inference/bin/python -m pip install "<path_to_compatible_vllm.whl>"
+PIP_CACHE_DIR="$PWD/cache/pip" envs/inference/bin/python -m pip install -r requirements-inference.txt
 source env.sh
-envs/inference312/bin/python -c 'from vllm.engine.omnidrca2_engine import OmniDRCA2Engine; import onnxruntime'
+envs/inference/bin/python -c 'from vllm.engine.omnidrca2_engine import OmniDRCA2Engine; import onnxruntime'
 ```
 
 ### Training and evaluation environments
@@ -48,8 +50,8 @@ Install CUDA-matched PyTorch/torchaudio, NVIDIA Apex, Transformer Engine and fla
 python3.10 -m venv envs/train
 envs/train/bin/python -m pip install -r requirements-training.txt
 
-python3.12 -m venv --system-site-packages envs/metrics312
-envs/metrics312/bin/python -m pip install -r requirements-metrics.txt
+python3.12 -m venv --system-site-packages envs/metrics
+envs/metrics/bin/python -m pip install -r requirements-metrics.txt
 ```
 
 The launchers select their corresponding inference or metrics environment automatically. Activate `envs/train` for training. Set `PYTHON_BIN="<path_to_python>"` to use a different interpreter.
@@ -58,15 +60,25 @@ The launchers select their corresponding inference or metrics environment automa
 
 ### Model setup
 
-Download and install either release from Hugging Face (model repositories are under review — coming soon):
+Download and install either model from Hugging Face:
 
 ```bash
-envs/inference312/bin/python tools/download_model.py --mode streaming --repo-id "<hf_streaming_repo>"
-envs/inference312/bin/python tools/download_model.py --mode offline --repo-id "<hf_offline_repo>"
+envs/inference/bin/python tools/download_model.py --mode streaming --repo-id zhaoyx39/S3-S2ST --subfolder streaming
+envs/inference/bin/python tools/download_model.py --mode offline --repo-id zhaoyx39/S3-S2ST --subfolder offline
 # For files downloaded manually, replace --repo-id with --local-dir "<path_to_model_download>".
 ```
 
-Each release includes its matching 4B weights, Talker configuration and rendering assets. The installer verifies checksums and places files under `models/`; no external model paths are needed. Pin `--revision "<hf_commit>"` to select an exact release. For verification without installation, add `--verify-only`.
+Alternatively, download from ModelScope and use the same installer:
+
+```bash
+envs/inference/bin/python -m pip install modelscope
+envs/inference/bin/modelscope download --model zhaoyx239/S3-S2ST --include "streaming/**" --local_dir cache/model_downloads/modelscope
+envs/inference/bin/python tools/download_model.py --mode streaming --local-dir cache/model_downloads/modelscope --subfolder streaming
+envs/inference/bin/modelscope download --model zhaoyx239/S3-S2ST --include "offline/**" --local_dir cache/model_downloads/modelscope
+envs/inference/bin/python tools/download_model.py --mode offline --local-dir cache/model_downloads/modelscope --subfolder offline
+```
+
+One model repository contains `streaming/` and `offline/` variants. Each subdirectory includes its matching 4B weights, Talker configuration and rendering assets. The installer verifies checksums and places files under `models/`; no external model paths are needed. Pin `--revision "<hf_commit>"` to select an exact release. For verification without installation, add `--verify-only`.
 
 The two releases are named `streaming` and `offline`, without step or iteration suffixes. Place the bundles and shared assets inside the repository:
 
@@ -88,33 +100,33 @@ checkpoints/
 ### Translate an audio file
 
 ```bash
-envs/inference312/bin/python tools/make_input.py --audio "<path_to_input.wav>" --direction zh2en --output data/input.jsonl
-bash scripts/infer.sh --mode streaming --preset dynamic099 --model "<path_to_streaming_model>" --input data/input.jsonl --no-warmup --output runs/example --gpu 0
+envs/inference/bin/python tools/make_input.py --audio "<path_to_input.wav>" --direction zh2en --output data/input.jsonl
+bash scripts/infer.sh --mode streaming --preset adaptive --model "<path_to_streaming_model>" --input data/input.jsonl --no-warmup --output runs/example --gpu 0
 ```
 
-Use `--direction en2zh` for English-to-Chinese translation. For offline inference, use `--mode offline --model "<path_to_offline_model>"` and omit `--preset`. Streaming supports `fixed05`, `fixed01` and `dynamic099`. Audio, model and output paths resolve inside the repository; use a new output directory for each run. Outputs include `raw.jsonl`, generated audio and codec tokens.
+Use `--direction en2zh` for English-to-Chinese translation. For offline inference, use `--mode offline --model "<path_to_offline_model>"` and omit `--preset`. Streaming supports `fixed-0.5`, `fixed-0.1` and `adaptive`. Audio, model and output paths resolve inside the repository; use a new output directory for each run. Outputs include `raw.jsonl`, generated audio and codec tokens.
 
 ### FLEURS preparation and evaluation
 
 ```bash
-envs/inference312/bin/python tools/prepare_fleurs.py
-bash scripts/infer.sh --mode streaming --preset dynamic099 --input data/fleurs/test_all.jsonl --output runs/fleurs_stream --gpu 0
+envs/inference/bin/python tools/prepare_fleurs.py
+bash scripts/infer.sh --mode streaming --preset adaptive --input data/fleurs/test_all.jsonl --output runs/fleurs_stream --gpu 0
 bash scripts/evaluate.sh --run fleurs_stream --gpu 0 --full --skip-comet
-envs/metrics312/bin/python tools/report.py --run runs/fleurs_stream
+envs/metrics/bin/python tools/report.py --run runs/fleurs_stream
 ```
 
-Preparation downloads official metadata and audio, checks SHA256 and builds the paper subset: 945 ZH→EN and 646 EN→ZH examples. For an offline server, populate `cache/downloads/fleurs_hf/` first; pinned filenames and hashes are in `configs/fleurs_subset.json` and `configs/fleurs_archive_verified.json`.
+Preparation downloads official metadata and audio, checks SHA256 and builds the paper subset: 945 ZH→EN and 646 EN→ZH examples. For an offline server, populate `cache/downloads/fleurs_hf/` first; pinned filenames and hashes are in `configs/fleurs_subset.json` and `configs/fleurs_archives.json`.
 
 Place evaluation assets under `evaluation/third_party/cer_tool_parallel/models/`, `evaluation/third_party/torch_cache/` and `evaluation/voice_eval/thirdparty/3D-Speaker/pretrained/`. `--skip-comet` leaves COMET and ASR-COMET empty. To enable them, obtain the official XCOMET-XL checkpoint, run `tools/prepare_assets.py`, and omit the flag. Scores are written to `quality/summary.tsv` and averaged equally across directions.
 
 Optional whole-file gain preprocessing and parallel streaming decoding:
 
 ```bash
-envs/inference312/bin/python tools/boost_fleurs.py "<path_to_fleurs_audio>" --output-dir "<path_to_new_audio_directory>"
+envs/inference/bin/python tools/boost_fleurs.py "<path_to_fleurs_audio>" --output-dir "<path_to_new_audio_directory>"
 bash scripts/infer_parallel.sh --output runs/fleurs_parallel --gpus 0,1 --workers-per-gpu 2 --skip-metrics
 ```
 
-The parallel entry applies gain automatically: RMS target 0.0743324953, peak limit 0.95, boost only. It uses `fixed05`, FM8 and 1 GiB KV cache per engine. The single-worker entry uses the original audio. Gain preprocessing is optional and separate from the published results. Concurrent latency measures throughput conditions; measure single-request latency without competing workers. For separately preprocessed audio, update the input manifest to reference the new files.
+The parallel entry applies gain automatically: RMS target 0.0743324953, peak limit 0.95, boost only. It uses `fixed-0.5`, FM8 and 1 GiB KV cache per engine. The single-worker entry uses the original audio. Gain preprocessing is optional and separate from the published results. Concurrent latency measures throughput conditions; measure single-request latency without competing workers. For separately preprocessed audio, update the input manifest to reference the new files.
 
 ## Training
 
@@ -142,6 +154,24 @@ NNODES=4 NODE_RANK=0 MASTER_ADDR="<node0_address>" MASTER_PORT=12981 bash script
 ```
 
 Each stage defaults to its initializer under `checkpoints/`. Pass `--init "<path_to_checkpoint_parent>"` to select another initialization, including the preceding stage's output. Use `--prepare-only` to generate stage configuration before training. Offline nodes share the same project, data and output paths.
+
+## Citation
+
+If you find this work useful, please cite:
+
+```bibtex
+@misc{zhao2026s3s2st,
+  title={{S3-S2ST}: Semantically Supervised Streaming Speech-to-Speech Translation},
+  author={Yuxiang Zhao and Zhiyun Fan and Yu Pu and Yanjie An and Yushen Chen and
+          Wenrui Liang and Baiji Liu and Yunchong Xiao and Zhaoci Liu and Keqi Deng and
+          Kai Yu and Zhifu Gao and Xiangang Li and Xie Chen},
+  year={2026},
+  eprint={2610.36777},
+  archivePrefix={arXiv},
+  primaryClass={cs.SD},
+  url={https://arxiv.org/abs/2610.36777}
+}
+```
 
 ## License
 

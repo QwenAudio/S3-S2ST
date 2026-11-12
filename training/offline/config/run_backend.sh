@@ -20,10 +20,10 @@ done
 # Optional object-store settings are supplied by the caller.
 export OSS_ACCESS_KEY_ID OSS_ACCESS_KEY_SECRET
 [[ -z "${OSS_SESSION_TOKEN:-}" ]] || export OSS_SESSION_TOKEN
-export OSS_ENDPOINT=${OSS_ENDPOINT:-oss-cn-shanghai-internal.aliyuncs.com}
+export OSS_ENDPOINT=${OSS_ENDPOINT:-}
 export OSS_REGION=${OSS_REGION:-cn-shanghai}
 export OSS_BUCKET_NAME=${OSS_BUCKET_NAME:-example-storage-1}
-export OSS_ENDPOINT_SH=${OSS_ENDPOINT_SH:-oss-cn-shanghai-internal.aliyuncs.com}
+export OSS_ENDPOINT_SH=${OSS_ENDPOINT_SH:-}
 export OSS_REGION_SH=${OSS_REGION_SH:-cn-shanghai}
 export OSS_BUCKET_NAME_SH=${OSS_BUCKET_NAME_SH:-example-storage-4}
 

@@ -79,7 +79,7 @@ def native_offline_streaming_model_provider(pre_process=True, post_process=True)
         )
         expected_encoder_source = (
             _streaming_repo_root
-            / "streaming/vendor/hejia_true_streaming_encoder/audio_encoder.py"
+            / "streaming/vendor/streaming_audio_encoder/audio_encoder.py"
         ).resolve()
         gated_delta_layers = [
             module for module in model.modules()

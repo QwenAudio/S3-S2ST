@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[1]
 def main():
  p=argparse.ArgumentParser(description='Paper inference with local model assets')
  p.add_argument('--model',type=Path);p.add_argument('--mode',choices=['streaming','offline'],default='streaming');p.add_argument('--input',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--gpu',type=int,default=0)
- p.add_argument('--preset',choices=['fixed05','fixed01','dynamic099'],default='dynamic099');p.add_argument('--threshold',type=float);p.add_argument('--limit',type=int);p.add_argument('--warmup',type=Path,default=ROOT/'data/fleurs/warmup.jsonl');p.add_argument('--no-warmup',action='store_true');p.add_argument('--dry-run',action='store_true')
+ p.add_argument('--preset',choices=['fixed-0.5','fixed-0.1','adaptive'],default='adaptive');p.add_argument('--threshold',type=float);p.add_argument('--limit',type=int);p.add_argument('--warmup',type=Path,default=ROOT/'data/fleurs/warmup.jsonl');p.add_argument('--no-warmup',action='store_true');p.add_argument('--dry-run',action='store_true')
  p.add_argument('--kv-cache-gib',type=float,help='Explicit per-engine KV memory for concurrent decoding')
  p.add_argument('--pool-worker',action='store_true',help=argparse.SUPPRESS)
  a=p.parse_args();out=a.output.resolve();out.relative_to(ROOT);out.mkdir(parents=True,exist_ok=True)
@@ -39,13 +39,13 @@ def main():
   if not a.no_warmup:cmd += ['--warmup-input',str(a.warmup.resolve())]
   env['PYTHONPATH']=str(ROOT/'inference/offline/scripts')+':'+str(ROOT/'inference/offline/vendor/streaming_eval')+':'+env.get('PYTHONPATH','')
  else:
-  preset={'fixed05':(.5,.5,1.),'fixed01':(.1,.1,1.),'dynamic099':(.1,.99,.5)}[a.preset];base,cap,power=preset
+  preset={'fixed-0.5':(.5,.5,1.),'fixed-0.1':(.1,.1,1.),'adaptive':(.1,.99,.5)}[a.preset];base,cap,power=preset
   if a.threshold is not None:
    assert 0<a.threshold<1;base=cap=a.threshold;power=1.
   policy=dict(deliver_read_hidden=True,fm_chunk=8,diagnostic=True,base=base,cap=cap,saturation=1.,power=power,paced=True,fm_config=str(ROOT/'configs/fm_config.yaml'),vocoder_checkpoint=str(ROOT/'models/vocoder/model.pt' if (ROOT/'models/vocoder/model.pt').is_file() else ROOT/'models/vocoder/epoch_75_whole.pt'),vocoder_config=str(ROOT/'models/vocoder/config.yaml'))
   if not a.no_warmup:policy['warmup']=str(a.warmup.resolve())
   (out/'policy.json').write_text(json.dumps(policy,indent=2));(out/'settings.json').write_text(json.dumps(dict(code=str(ROOT/'inference/streaming'),model=str(model),gate=str(model/'streaming_gate.pt'))))
-  (out/'sampling.json').write_bytes((ROOT/'configs/talker_k5.json').read_bytes());(out/'evidence').mkdir(exist_ok=True)
+  (out/'sampling.json').write_bytes((ROOT/'configs/sampling.json').read_bytes());(out/'evidence').mkdir(exist_ok=True)
   files=[* (ROOT/'inference/streaming').rglob('*.py'),* (ROOT/'inference/runtime').glob('*.py')]
   (out/'evidence/source_hashes.json').write_text(json.dumps({str(f):hashlib.sha256(f.read_bytes()).hexdigest() for f in files}))
   env.update(TUNE_ROOT=str(out),TUNE_CONFIG=str(out/'sampling.json'),SINGLE_GPU_PHYSICAL_ID=str(a.gpu),SINGLE_CAPTURE_AUDIT=str(out/'hidden_audit.jsonl'),S3_POLICY_CONFIG=str(out/'policy.json'),CODEX_TALKER_MAX_CODEC_TEXT_RATIO='0',CODEX_AUDIO_BLANK_TOKEN_COUNT='5',CODEX_ALIGNMENT_MASK_TOKEN_ID='-60')

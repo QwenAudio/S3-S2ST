@@ -191,15 +191,15 @@ class OmniDRCA2TalkerForConditionalGeneration(
             self.config.eos_token_id = self.config.codec_unit
 
         self.cosyvoice_model_dir = model_dir
-        self.cosyvoice_llm_file = self._codex_cfg_get("llm_file", "cosyvoice_llm.pt")
+        self.cosyvoice_llm_file = self._codex_cfg_get("llm_file", "talker.pt")
         self.cosyvoice_input_proj_file = self._codex_cfg_get(
-            "input_proj_file", "cosyvoice_llm_input_proj.pt"
+            "input_proj_file", "talker_input_proj.pt"
         )
         self.cosyvoice_codec_embed_file = self._codex_cfg_get(
-            "codec_embed_file", "cosyvoice_codec_embed.pt"
+            "codec_embed_file", "talker_codec_embed.pt"
         )
         self.cosyvoice_codec_head_file = self._codex_cfg_get(
-            "codec_head_file", "cosyvoice_llm_codec_head.pt"
+            "codec_head_file", "talker_codec_head.pt"
         )
         self._cosyvoice_weights_loaded = False
 

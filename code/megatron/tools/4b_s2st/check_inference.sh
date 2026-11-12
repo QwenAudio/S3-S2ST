@@ -3,13 +3,13 @@ set -euo pipefail
 
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
 workspace_root=$(cd -- "${repo_root}/.." && pwd)
-hf_dir=${1:-${workspace_root}/artifacts/4b_s2st/validation/iter_0001600_HF}
-output_dir=${2:-${workspace_root}/artifacts/4b_s2st/validation/iter_0001600_inference}
+hf_dir=${1:-${workspace_root}/artifacts/4b_s2st/validation/model}
+output_dir=${2:-${workspace_root}/artifacts/4b_s2st/validation/inference}
 source_reproduction=/path/to/qwen3.5-4B
 
 if [[ ! -s "${hf_dir}/model.safetensors.index.json" ]]; then
-    bash "${repo_root}/tools/4b_s2st/convert_iter1600_to_hf.sh" \
-        /path/to/iter_0001600 \
+    bash "${repo_root}/tools/4b_s2st/export_checkpoint.sh" \
+        /path/to/checkpoint \
         "${hf_dir}"
 fi
 if [[ -e "${output_dir}" ]]; then
@@ -18,7 +18,7 @@ if [[ -e "${output_dir}" ]]; then
 fi
 
 # Reuse the already-vendored evaluator and immutable six-direction FLEURS list;
-# all predictions and logs are written under the 0803 target workspace.
+# all predictions and logs are written under the project workspace.
 RUN_METRIC=${RUN_METRIC:-false} \
     bash "${source_reproduction}/reproduce/run_inference_and_eval.sh" \
     "${hf_dir}" \

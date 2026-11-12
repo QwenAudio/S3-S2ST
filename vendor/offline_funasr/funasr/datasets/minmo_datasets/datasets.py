@@ -35,10 +35,10 @@ def _rewrite_audio_path_for_oss_cache(path_cur, use_oss_cache=False):
         elif path_cur.startswith("/mnt"):
             path_cur = path_cur.replace("/mnt", "/nfs_cache", 1)
         path_cur = path_cur.replace("oss://example-storage-3", "/nfs_cache", 1)
-        path_cur = path_cur.replace("oss://fun-asr-train-data-shanghai", "/oss-fun-asr-train-data-shanghai", 1)
+        path_cur = path_cur.replace("oss://example-storage-4", "/oss-example-storage-4", 1)
         path_cur = path_cur.replace("oss://example-storage-4", "/nls_spider_sh_cache", 1)
         path_cur = path_cur.replace("oss://example-storage-1", "/fun_resource_sh_cache", 1)
-        path_cur = path_cur.replace("oss://fun-asr-train-data-shanghai", "/oss-fun-asr-train-data-shanghai", 1)
+        path_cur = path_cur.replace("oss://example-storage-4", "/oss-example-storage-4", 1)
     else:
         path_cur = path_cur.replace("oss://example-storage-3/", "oss://example-storage-1/")
     return path_cur

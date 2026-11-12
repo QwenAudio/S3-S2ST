@@ -36,7 +36,7 @@ def worker(job):
             user = next((m for m in row['messages'] if m['role'] == 'user'))
             m = re.search('<\\|startofspeech\\|>!?(.*?)<\\|endofspeech\\|>', user.get('content', user.get('text', '')))
             if not m:
-                raise ValueError(f'Missing source at {source}:{stats['rows']}')
+                raise ValueError(f"Missing source at {source}:{stats['rows']}")
             key = m[1].replace('oss://example-storage-4/', '').replace('/nls_spider_sh_cache/', '').replace('oss://example-storage-1/', '').replace('/fun_resource_sh_cache/', '')
             split = 'dev' if int(hashlib.sha256(key.encode()).hexdigest()[:16], 16) % 10000 < 2 else 'train'
             item = conv.convert_format(row)
@@ -80,7 +80,7 @@ def main():
             stats.append(s)
             print(json.dumps(s), flush=True)
     rng = random.Random(20260918)
-    active = [(out / 'train' / f'{s['index']:04d}.jsonl').open() for s in stats if s['train_bins']]
+    active = [(out / 'train' / f"{s['index']:04d}.jsonl").open() for s in stats if s['train_bins']]
     bins = [s['train_bins'] for s in stats if s['train_bins']]
     writers = [(out / 'mixed' / f'{i:03d}.jsonl').open('w') for i in range(32 if a.smoke else 256)]
     count = 0
@@ -100,7 +100,7 @@ def main():
     for f in writers:
         f.close()
     train = [p for p in sorted((out / 'mixed').glob('*.jsonl')) if p.stat().st_size]
-    valid = [out / 'dev' / f'{s['index']:04d}.jsonl' for s in stats if s['dev_bins']]
+    valid = [out / 'dev' / f"{s['index']:04d}.jsonl" for s in stats if s['dev_bins']]
     if not valid and a.smoke:
         valid = train[:1]
     if not valid:

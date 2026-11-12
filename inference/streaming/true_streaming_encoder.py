@@ -52,7 +52,7 @@ def enable_true_streaming_encoder(encoder: nn.Module, chunk_ms: float = 640.0) -
         attn.qkv_attention = MethodType(qkv_attention, attn)
 
     def streaming_forward(module, x, ilens=None, **_kwargs):
-        # Match Hejia's 2026-08-20 training implementation: both strided
+        # Match reference training implementation: both strided
         # convolutions use left-only causal padding.  The 2.5-ms waveform
         # lookahead remains necessary for the centered Whisper STFT boundary.
         x = F.pad(x, (module.conv1.kernel_size[0] - 1, 0))
