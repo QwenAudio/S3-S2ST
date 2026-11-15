@@ -96,7 +96,7 @@ def main():
         from huggingface_hub import snapshot_download
         source = Path(snapshot_download(
             repo_id=args.repo_id, revision=args.revision,
-            allow_patterns=[args.subfolder + '/**'] if args.subfolder else None,
+            allow_patterns=['config.json', args.subfolder + '/**'] if args.subfolder else None,
             local_dir=ROOT / 'cache' / 'model_downloads' / args.mode))
     if args.subfolder and (args.repo_id or not (source / 'release.json').is_file()):
         source = source / args.subfolder
