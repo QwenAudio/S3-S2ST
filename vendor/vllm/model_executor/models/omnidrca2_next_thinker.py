@@ -876,10 +876,7 @@ class OmniDRCA2NextForConditionalGeneration(
         if os.path.exists(encoder_ckpt_path):
             loaded, skipped_mismatch = load_pretrained_module(encoder_ckpt_path, self.audio_encoder, remove_prefix="audio_encoder.")
             print(f"audio_encoder 加载完成: loaded={loaded}, encoder_ckpt_path: {encoder_ckpt_path}, skipped_mismatch={skipped_mismatch}")
-        llm_dim = None
-
-        if llm_dim is None:
-            llm_dim = audio_adaptor_conf["llm_dim"]
+        llm_dim = config.text_config.hidden_size
         adp_cfg = {**audio_adaptor_conf, "encoder_dim": encoder_output_dim, "llm_dim": llm_dim}
   
         object.__setattr__(self, "audio_adaptor", Transformer(**adp_cfg))
@@ -890,18 +887,22 @@ class OmniDRCA2NextForConditionalGeneration(
             loaded, skipped_mismatch = load_pretrained_module(adaptor_ckpt_path, self.audio_adaptor, remove_prefix="audio_adaptor.")
             print(f"   audio_adaptor 加载完成: loaded={loaded}, audio_adaptor_ckpt_path: {adaptor_ckpt_path}, skipped_mismatch={skipped_mismatch}")
 
+        is_moe = config.text_config.model_type == "qwen3_5_moe_text"
+        language_model_arch = (
+            "Qwen3_5MoeForCausalLM" if is_moe else "Qwen3_5ForCausalLM"
+        )
         self.language_model = init_vllm_registered_model(
             vllm_config=vllm_config,
             hf_config=config.text_config,
             prefix=maybe_prefix(prefix, "language_model"),
-            architectures=["Qwen3_5MoeForCausalLM"],
+            architectures=[language_model_arch],
         )
         self.make_empty_intermediate_tensors = (
             self.language_model.make_empty_intermediate_tensors
         )
 
-        # set MoE hyperparameters
-        self.set_moe_parameters()
+        if is_moe:
+            self.set_moe_parameters()
 
 
 
