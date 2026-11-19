@@ -31,14 +31,14 @@ sudo apt-get install -y git ffmpeg libsndfile1 cmake ninja-build build-essential
 
 Dependencies are defined in `pyproject.toml`, with `inference`, `train`, `eval` and `data` extras. For Conda setup, see the [environment guide](docs/ENVIRONMENT.md).
 
-The reference environment uses Python 3.12, NVIDIA PyTorch 2.7.0a0 (25.03), CUDA 12.8, torchaudio 2.6.0a0 and Triton 3.2.0. Use the NVIDIA PyTorch 25.03 container or a compatible CUDA/PyTorch base. The bundled vLLM Python code requires compiled vLLM kernels compatible with commit `6ac0cd370316e7c940d237e803b0eb8eda282f01`.
+Use the NVIDIA PyTorch 25.03 container (Linux x86_64, Python 3.12.3, CUDA 12.8) with the S3-S2ST vLLM wheel and pinned dependencies. See the [environment guide](docs/ENVIRONMENT.md) for the container command and exact versions. Download all three wheels, `inference-runtime.txt` and `SHA256SUMS` from [Runtime v1](https://github.com/QwenAudio/S3-S2ST/releases/tag/runtime-v1) into `cache/vllm_release/`.
 
 ```bash
 python3.12 -m venv --system-site-packages envs/inference
-envs/inference/bin/python -m pip install --upgrade pip
-# Install your compatible compiled vLLM wheel before the Python dependencies.
-envs/inference/bin/python -m pip install "<path_to_compatible_vllm.whl>"
-PIP_CACHE_DIR="$PWD/cache/pip" envs/inference/bin/python -m pip install -e ".[inference]"
+RUNTIME="$PWD/cache/vllm_release"
+envs/inference/bin/python -m pip install --no-deps -r "$RUNTIME/inference-runtime.txt"
+envs/inference/bin/python -m pip install --no-deps "$RUNTIME"/*.whl
+envs/inference/bin/python -m pip install --no-deps -e .
 source env.sh
 envs/inference/bin/python -c 'from vllm.engine.omnidrca2_engine import OmniDRCA2Engine; import onnxruntime'
 ```
