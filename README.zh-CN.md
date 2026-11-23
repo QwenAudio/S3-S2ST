@@ -5,9 +5,7 @@
 [![ModelScope](https://img.shields.io/badge/ModelScope-Models-624AFF?style=flat-square)](https://modelscope.cn/collections/zhaoyx239/S3-S2ST)
 [![Demo](https://img.shields.io/badge/Demo-Try%20it%20online-2EA44F?style=flat-square)](https://translate.sjtuxlance.com/compare)
 
-[English](README.md)
-
-[交互 Demo 已上线](https://translate.sjtuxlance.com/compare)，欢迎体验！
+[English](README.md) | [Chinese](README.zh-CN.md)
 
 ## 摘要
 
