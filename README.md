@@ -2,7 +2,7 @@
 
 [![arXiv](https://img.shields.io/badge/arXiv-2610.36777-b31b1b?style=flat-square&logo=arxiv)](https://arxiv.org/abs/2610.36777)
 [![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Models-FFD21E?style=flat-square&logo=huggingface&logoColor=black)](https://huggingface.co/collections/zhaoyx39/s3-s2st-6b03d6c2620ccacbd3727d28)
-[![ModelScope](https://img.shields.io/badge/ModelScope-Models-624AFF?style=flat-square)](https://modelscope.cn/models/zhaoyx239/S3-S2ST)
+[![ModelScope](https://img.shields.io/badge/ModelScope-Models-624AFF?style=flat-square)](https://modelscope.cn/collections/zhaoyx239/S3-S2ST)
 [![Demo](https://img.shields.io/badge/Demo-Try%20it%20online-2EA44F?style=flat-square)](https://translate.sjtuxlance.com/compare)
 
 [中文](README.zh-CN.md)
@@ -76,13 +76,13 @@ Alternatively, download from ModelScope and use the same installer:
 
 ```bash
 envs/inference/bin/python -m pip install modelscope
-envs/inference/bin/modelscope download --model zhaoyx239/S3-S2ST --include "streaming/**" --local_dir cache/model_downloads/modelscope
-envs/inference/bin/python tools/download_model.py --mode streaming --local-dir cache/model_downloads/modelscope --subfolder streaming
-envs/inference/bin/modelscope download --model zhaoyx239/S3-S2ST --include "offline/**" --local_dir cache/model_downloads/modelscope
-envs/inference/bin/python tools/download_model.py --mode offline --local-dir cache/model_downloads/modelscope --subfolder offline
+envs/inference/bin/modelscope download --model zhaoyx239/S3-S2ST-4B-Streaming --local_dir cache/model_downloads/modelscope/streaming
+envs/inference/bin/python tools/download_model.py --mode streaming --local-dir cache/model_downloads/modelscope/streaming
+envs/inference/bin/modelscope download --model zhaoyx239/S3-S2ST-4B-Offline --local_dir cache/model_downloads/modelscope/offline
+envs/inference/bin/python tools/download_model.py --mode offline --local-dir cache/model_downloads/modelscope/offline
 ```
 
-One model repository contains `streaming/` and `offline/` variants. Each subdirectory includes its matching 4B weights, Talker configuration and rendering assets. The installer verifies checksums and places files under `models/`; no external model paths are needed. Pin `--revision "<hf_commit>"` to select an exact release. For verification without installation, add `--verify-only`.
+Streaming and offline models have separate repositories. Each includes its matching 4B weights, Talker configuration and rendering assets. The installer verifies checksums and places files under `models/`; no external model paths are needed. Pin `--revision "<hf_commit>"` to select an exact release. For verification without installation, add `--verify-only`.
 
 The two releases are named `streaming` and `offline`, without step or iteration suffixes. Place the bundles and shared assets inside the repository:
 

@@ -2,7 +2,7 @@
 
 [![arXiv](https://img.shields.io/badge/arXiv-2610.36777-b31b1b?style=flat-square&logo=arxiv)](https://arxiv.org/abs/2610.36777)
 [![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Models-FFD21E?style=flat-square&logo=huggingface&logoColor=black)](https://huggingface.co/collections/zhaoyx39/s3-s2st-6b03d6c2620ccacbd3727d28)
-[![ModelScope](https://img.shields.io/badge/ModelScope-Models-624AFF?style=flat-square)](https://modelscope.cn/models/zhaoyx239/S3-S2ST)
+[![ModelScope](https://img.shields.io/badge/ModelScope-Models-624AFF?style=flat-square)](https://modelscope.cn/collections/zhaoyx239/S3-S2ST)
 [![Demo](https://img.shields.io/badge/Demo-Try%20it%20online-2EA44F?style=flat-square)](https://translate.sjtuxlance.com/compare)
 
 [English](README.md)
@@ -76,13 +76,13 @@ envs/inference/bin/python tools/download_model.py --mode offline --repo-id zhaoy
 
 ```bash
 envs/inference/bin/python -m pip install modelscope
-envs/inference/bin/modelscope download --model zhaoyx239/S3-S2ST --include "streaming/**" --local_dir cache/model_downloads/modelscope
-envs/inference/bin/python tools/download_model.py --mode streaming --local-dir cache/model_downloads/modelscope --subfolder streaming
-envs/inference/bin/modelscope download --model zhaoyx239/S3-S2ST --include "offline/**" --local_dir cache/model_downloads/modelscope
-envs/inference/bin/python tools/download_model.py --mode offline --local-dir cache/model_downloads/modelscope --subfolder offline
+envs/inference/bin/modelscope download --model zhaoyx239/S3-S2ST-4B-Streaming --local_dir cache/model_downloads/modelscope/streaming
+envs/inference/bin/python tools/download_model.py --mode streaming --local-dir cache/model_downloads/modelscope/streaming
+envs/inference/bin/modelscope download --model zhaoyx239/S3-S2ST-4B-Offline --local_dir cache/model_downloads/modelscope/offline
+envs/inference/bin/python tools/download_model.py --mode offline --local-dir cache/model_downloads/modelscope/offline
 ```
 
-同一模型仓库下的 `streaming/` 和 `offline/` 子目录分别包含对应的 4B 权重、Talker 配置和语音渲染组件。安装脚本校验哈希并将文件放入 `models/`，无需引用外部模型路径。使用 `--revision "<hf_commit>"` 固定版本；添加 `--verify-only` 可只校验、不安装。
+流式和离线模型分别存放在独立仓库中，每个仓库包含对应的 4B 权重、Talker 配置和语音渲染组件。安装脚本校验哈希并将文件放入 `models/`，无需引用外部模型路径。使用 `--revision "<hf_commit>"` 固定版本；添加 `--verify-only` 可只校验、不安装。
 
 对外仅区分 `streaming`（流式）和 `offline`（离线）两个模型，不在模型名中添加 step 或 iteration 后缀。下载后将模型与公共组件按以下结构放入仓库：
 
