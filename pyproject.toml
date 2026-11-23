@@ -13,7 +13,7 @@ license = "MIT"
 [project.urls]
 Repository = "https://github.com/QwenAudio/S3-S2ST"
 Paper = "https://arxiv.org/abs/2610.36777"
-HuggingFace = "https://huggingface.co/zhaoyx39/S3-S2ST"
+HuggingFace = "https://huggingface.co/collections/zhaoyx39/s3-s2st-6b03d6c2620ccacbd3727d28"
 ModelScope = "https://modelscope.cn/models/zhaoyx239/S3-S2ST"
 
 [project.optional-dependencies]

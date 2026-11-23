@@ -1,6 +1,6 @@
 # Model assets
 
-Two model releases are provided: `streaming` and `offline`. Release names have no step or iteration suffix. Install from Hugging Face with `python tools/download_model.py --mode streaming --repo-id "<hf_streaming_repo>"` (use `offline` for the offline release), or use `--local-dir "<path_to_download>"` for manually downloaded files. The installer verifies checksums and places bundles and shared assets inside the repository:
+The [S3-S2ST Collection](https://huggingface.co/collections/zhaoyx39/s3-s2st-6b03d6c2620ccacbd3727d28) contains two model releases: [streaming](https://huggingface.co/zhaoyx39/S3-S2ST-4B-Streaming) and [offline](https://huggingface.co/zhaoyx39/S3-S2ST-4B-Offline). Release names have no step or iteration suffix. Install from Hugging Face with `python tools/download_model.py --mode streaming --repo-id zhaoyx39/S3-S2ST-4B-Streaming` (use `--mode offline --repo-id zhaoyx39/S3-S2ST-4B-Offline` for the offline release), or use `--local-dir "<path_to_download>"` for manually downloaded files. The installer verifies checksums and places bundles and shared assets inside the repository:
 
 ```text
 models/

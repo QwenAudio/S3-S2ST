@@ -1,7 +1,7 @@
 # S3-S2ST：语义监督的流式语音到语音翻译
 
 [![arXiv](https://img.shields.io/badge/arXiv-2610.36777-b31b1b?style=flat-square&logo=arxiv)](https://arxiv.org/abs/2610.36777)
-[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Models-FFD21E?style=flat-square&logo=huggingface&logoColor=black)](https://huggingface.co/zhaoyx39/S3-S2ST)
+[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Models-FFD21E?style=flat-square&logo=huggingface&logoColor=black)](https://huggingface.co/collections/zhaoyx39/s3-s2st-6b03d6c2620ccacbd3727d28)
 [![ModelScope](https://img.shields.io/badge/ModelScope-Models-624AFF?style=flat-square)](https://modelscope.cn/models/zhaoyx239/S3-S2ST)
 [![Demo](https://img.shields.io/badge/Demo-Try%20it%20online-2EA44F?style=flat-square)](https://translate.sjtuxlance.com/compare)
 
@@ -67,8 +67,8 @@ envs/metrics/bin/python -m pip install -e ".[eval]"
 从 Hugging Face 下载并安装流式或离线版本：
 
 ```bash
-envs/inference/bin/python tools/download_model.py --mode streaming --repo-id zhaoyx39/S3-S2ST --subfolder streaming
-envs/inference/bin/python tools/download_model.py --mode offline --repo-id zhaoyx39/S3-S2ST --subfolder offline
+envs/inference/bin/python tools/download_model.py --mode streaming --repo-id zhaoyx39/S3-S2ST-4B-Streaming
+envs/inference/bin/python tools/download_model.py --mode offline --repo-id zhaoyx39/S3-S2ST-4B-Offline
 # 手动下载时，将 --repo-id 替换为 --local-dir "<path_to_model_download>"。
 ```
 
